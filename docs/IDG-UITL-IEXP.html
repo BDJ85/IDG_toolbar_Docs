@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iExport — van idee tot uitvoering (IDG-UITL-IEXP)</title>
+<meta name="description" content="Volledige documentatie van iExport: batch-export van Revit-sheets en -views naar PDF, DWG, DGN, DWF, NWC, IFC en IMG via pyRevit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne documentatie</span>
+  <h1>iExport — van idee tot uitvoering</h1>
+  <p class="sub">Volledige uitleg van de batch-exporttool voor Revit: waarom hij bestaat, uit welke bouwstenen hij is opgetrokken, hoe de wizard werkt en welke keuzes onderweg zijn gemaakt.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-IEXP</b></span>
+    <span>Versie <b>1.1</b></span>
+    <span>App-versie <b>0.3.2 (Fase 1 afgerond)</b></span>
+    <span>Revit <b>2022+</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Waarom iExport bestaat</h2></div><span class="flens"></span></div>
+
+<p>Elke tekenkamer kent het ritueel: een set sheets moet de deur uit als PDF, dezelfde set als DWG naar de constructeur, en het 3D-model als IFC naar de coördinator. Handmatig betekent dat drie keer dezelfde selectie maken, drie exportdialogen doorlopen en daarna bestanden hernoemen omdat Revit zijn eigen naamgeving hanteert. iExport vervangt dat ritueel door één wizard van drie stappen: <b>Selectie → Formaat → Aanmaken</b>. Je kiest één keer wat er mee moet, vinkt aan in welke formaten, en de tool doet de rest — inclusief nette bestandsnamen, een voortgangsbalk en een CSV-rapport van wat er gebeurd is.</p>
+
+<p>De functionele lat is gelegd door DiRoots ProSheets, jarenlang de standaard voor dit werk. Maar die tool stamt uit het tijdperk vóór Revit 2022 en exporteert PDF daarom via een <i>printerdriver</i> (in de schermafbeeldingen zie je letterlijk "PDF24" als printer staan). Sinds Revit 2022 heeft de Revit API een volwaardige, ingebouwde PDF-export — sneller, zonder driver-gedoe, en volledig te sturen vanuit code. iExport is op die moderne route gebouwd.</p>
+
+<div class="kader k-tip"><span class="lb">Eigen werk, eigen ontwerp</span>
+<p>iExport is een <i>clean-room</i> reimplementatie: gebouwd op basis van wat je als gebruiker aan functionaliteit ziet, zonder ook maar één regel code, icoon of asset van derden. De vormgeving (petrolkleurige wizard) en de architectuur zijn eigen ontwerp. De tool is privé ontwikkeld en als onderdeel van de toolbar ter beschikking gesteld.</p>
+</div>
+
+<h3>1.1 Wat de tool in één oogopslag kan</h3>
+<ul class="checklist">
+<li>Sheets én views in bulk exporteren naar PDF, DWG, DWF, NWC, IFC en IMG; DGN staat als zevende tegel zichtbaar geparkeerd voor een eventuele toekomstige versie.</li>
+<li>Bestandsnamen opbouwen uit sjablonen met tokens, in het Engels én Nederlands (<code>{Bladnummer}</code>, <code>{Datum:yyyyMMdd}</code>, <code>{p:Parameternaam}</code>).</li>
+<li>Complete invoer opslaan als <b>profiel</b> en in één klik terugladen.</li>
+<li>Filteren op View/Sheet Sets, zoeken, en sets vanuit de tool opslaan in het model.</li>
+<li>Per taak een zichtbare status (Gereed, Fout, Overgeslagen — nooit stilletjes iets weglaten) en een CSV-rapport.</li>
+</ul>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>De gereedschapskist</h2></div><span class="flens"></span></div>
+
+<p>iExport is geen los programma maar een samenspel van vier lagen die elk één taak hebben. Wie de lagen kent, weet bij elke vraag meteen wáár het antwoord ligt.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:22%">Laag</th><th style="width:30%">Wat is het?</th><th>Rol in iExport</th></tr>
+<tr><td><b>Revit API</b></td><td>De programmeerinterface van Revit zelf (.NET). Alles wat Revit kan, zit hierin als klassen en functies.</td><td>Het eigenlijke exporteren: <code>PDFExportOptions</code>, <code>DWGExportOptions</code>, <code>IFCExportOptions</code> enzovoort, plus het verzamelen van sheets, views, sets en fasen.</td></tr>
+<tr><td><b>pyRevit</b></td><td>Het framework dat Python-scripts als knoppen in het Revit-lint hangt en de Python-engine host.</td><td>Levert de knop (<code>iExport.pushbutton</code>), laadt <code>script.py</code> bij de klik, en geeft hulpmiddelen zoals <code>forms.WPFWindow</code> en het outputvenster.</td></tr>
+<tr><td><b>IronPython 2.7</b></td><td>Een Python-implementatie die draait op .NET, waardoor Python rechtstreeks .NET-klassen kan gebruiken.</td><td>De taal waarin alles geschreven is. Via <code>clr</code> praat de code met de Revit API en WPF alsof het Python-bibliotheken zijn.</td></tr>
+<tr><td><b>WPF + XAML</b></td><td>Microsofts UI-framework; XAML is de opmaaktaal waarin je vensters beschrijft.</td><td>Het hele wizardvenster staat declaratief in <code>ui.xaml</code>: tabs, grids, knoppen, stijlen. De Python-code vult het en reageert op events.</td></tr>
+</table></div>
+
+<p>De brug tussen die werelden is verrassend dun. IronPython laadt een .NET-assembly en vanaf dat moment zijn Revit-klassen gewone Python-objecten:</p>
+
+<figure class="code"><figcaption>de brug: .NET-klassen gebruiken vanuit Python<span>python</span></figcaption>
+<pre><code class="lang-py">import clr
+clr.AddReference("RevitAPI")
+from Autodesk.Revit.DB import PDFExportOptions, ColorDepthType
+
+opties = PDFExportOptions()          # een .NET-object...
+opties.Combine = True                # ...met Python-syntax bediend
+opties.ColorDepth = ColorDepthType.Color</code></pre></figure>
+
+<h3>2.1 Waarom Python en niet C#?</h3>
+<p>Een terechte vraag, want "professionele" Revit-add-ins zijn vaak C#. Het beslissende inzicht: <b>beide talen praten tegen exact dezelfde Revit API</b>. Elke exportoptie die C# kan zetten, zet IronPython ook — er is geen functionaliteit in iExport die C# mogelijk maakt en Python niet. Wat C# wél biedt (installatie zonder pyRevit, debuggen met breakpoints, strakkere typechecks) weegt pas als de tool functioneel is uitgekristalliseerd. Tot die tijd wint Python op iteratiesnelheid: code aanpassen, Revit herstarten, testen — zonder compileerstap. Daarom is de afspraak: bouwen en bewijzen in pyRevit, en pas daarna een eventuele C#-port van een <i>bewezen</i> ontwerp (zie hoofdstuk 11).</p>
+
+<div class="kader k-tip"><span class="lb">Goed om te weten</span>
+<p>De motor van iExport (map <code>lib/iexport</code>) bevat bewust nul UI-code. Een latere C#-port hoeft daardoor alleen de schil te vervangen; de exportlogica is al taalonafhankelijk beschreven en getest.</p>
+</div>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Architectuur: motor en schil</h2></div><span class="flens"></span></div>
+
+<p>Het ontwerpprincipe is een strikte scheiding tussen <b>motor</b> (alles wat exporteert, verzamelt en rekent) en <b>schil</b> (het venster). De motor weet niets van knoppen of grids; de schil weet niets van de Revit API. Ze praten via twee eenvoudige datastructuren: rijen en een instellingen-dictionary.</p>
+
+<div class="tree"><b>iexport/</b>
+├── README.md                     <i>installatie, statusmatrix, snelstart</i>
+├── <b>docs/</b>
+│   ├── PLAN.md                   <i>bouwplan, beslissingen, roadmap</i>
+│   └── IDG-UITL-IEXP.html        <i>dit document</i>
+├── <b>lib/</b>
+│   └── <b>iexport/</b>                  <i>DE MOTOR — geen UI-code</i>
+│       ├── const.py              <i>alle vaste lijsten en teksten op één plek</i>
+│       ├── models.py             <i>bindbare rijen: ItemRow en JobRow</i>
+│       ├── collect.py            <i>sheets/views/sets/fasen uit het model halen</i>
+│       ├── naming.py             <i>tokens vertalen naar bestandsnamen</i>
+│       ├── papersize.py          <i>bladmaat (mm) → "A1 liggend"</i>
+│       ├── profiles.py           <i>profielen lezen/schrijven (JSON)</i>
+│       ├── report.py             <i>CSV-rapport wegschrijven</i>
+│       ├── wpfutil.py            <i>voortgang live houden, panelen tonen/verbergen</i>
+│       └── <b>exporters/</b>            <i>één module per formaat + de orchestrator</i>
+│           ├── __init__.py       <i>registry + run_jobs()</i>
+│           ├── pdf.py · dwg.py · dgn.py · dwf.py
+│           └── nwc.py · ifc.py · img.py
+└── <b>iExport.pushbutton/</b>           <i>DE SCHIL — de knop in het lint</i>
+    ├── bundle.yaml               <i>naam, tooltip, auteur</i>
+    ├── ui.xaml                   <i>het complete venster, declaratief</i>
+    └── script.py                 <i>events, invoer verzamelen, motor aanroepen</i></div>
+
+<h3>3.1 De twee rijsoorten</h3>
+<p>Alles wat je in de tabellen ziet, is een van twee objecten uit <code>models.py</code>. Een <b>ItemRow</b> is één sheet of view op tabblad Selectie: nummer, naam, revisie, bladmaat, oriëntatie en een bewerkbare bestandsnaam. Een <b>JobRow</b> is één regel op tabblad Aanmaken: de combinatie van een ItemRow met één formaat, plus een status. Vink je vier sheets en twee formaten aan, dan ontstaan er dus acht jobs. Beide rijen implementeren <code>INotifyPropertyChanged</code> — het WPF-mechanisme waarmee een schermtabel automatisch ververst zodra de onderliggende data verandert. Daardoor zie je tijdens de run de status per regel live verspringen van <i>Wachtrij</i> naar <i>Bezig…</i> naar <i>Gereed</i>.</p>
+
+<h3>3.2 De instellingen-dictionary</h3>
+<p>Bij de klik op <b>Aanmaken</b> leest de schil élke checkbox, combobox en elk tekstveld uit en bouwt daarvan één geneste dictionary: per formaat een setje sleutel/waarde-paren (<code>{"pdf": {"color": "color", "paper": "ISO_A3", …}, "dwg": {…}}</code>). Die dictionary is het complete contract tussen schil en motor — en het is exact wat er als profiel op schijf wordt opgeslagen. De koppeling verloopt via drie kleine tabellen in <code>script.py</code> (<code>BOOL_MAPS</code>, <code>COMBO_MAP</code>, <code>TEXT_MAP</code>), zodat een nieuwe instelling toevoegen neerkomt op één regel per tabel in plaats van losse leesregels door de hele code.</p>
+
+<h3>3.3 De orchestrator</h3>
+<p>De motorfunctie <code>run_jobs()</code> loopt de joblijst af met per taak een eigen foutvangnet: één mislukte export zet die ene regel op <i>Fout</i> met de reden, en de rest draait gewoon door. Formaten die niet bij een rij passen (IFC op een sheet, NWC zonder geïnstalleerde exporter) worden vóóraf al als <i>Overgeslagen</i> gemarkeerd — zichtbaar, met reden, nooit stil.</p>
+
+<figure class="code"><figcaption>exporters/__init__.py — registry en foutvangnet (fragment)<span>python</span></figcaption>
+<pre><code class="lang-py">_EXPORTERS = {
+    "pdf": pdf.PdfExporter(),  "dwg": dwg.DwgExporter(),
+    "dgn": dgn.DgnExporter(),  "dwf": dwf.DwfExporter(),
+    "nwc": nwc.NwcExporter(),  "ifc": ifc.IfcExporter(),
+    "img": img.ImgExporter(),
+}
+
+for job in jobs:                       # per taak, nooit alles-of-niets
+    try:
+        out = exporter.export_item(doc, job.item, folder,
+                                   job.item.FileName, fmt_settings)
+        job.Status = const.STATUS_DONE
+    except Exception as e:
+        job.Status = const.STATUS_ERROR.format(e)   # zichtbaar in de grid</code></pre></figure>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>De wizard, stap voor stap</h2></div><span class="flens"></span></div>
+
+<h3>4.1 Stap 1 — Selectie</h3>
+<p>Boven kies je <b>Sheets</b> of <b>Views</b>; bij views kun je daarnaast op viewtype filteren (plattegronden, doorsneden, 3D, …). De tabel toont per rij nummer, naam, revisie, bladmaat en oriëntatie — de bladmaat wordt uit het titelblok gelezen (in millimeters) en geclassificeerd als A-formaat. Drie gereedschappen versnellen het selecteren: het <b>View/Sheet Set-filter</b> (toont alleen rijen uit een gekozen set), het <b>zoekveld</b> (filtert live op nummer en naam) en <b>Alles/Geen</b> (werkt alleen op de zichtbare rijen, zodat filteren + alles aanvinken doet wat je verwacht). Onderin telt een regel live mee: "3 sheets en 2 views geselecteerd · totaal 5".</p>
+<p>De kolom <b>Bestandsnaam</b> is direct bewerkbaar, maar meestal laat je hem vullen door het sjabloon: pas het sjabloonveld aan en klik <i>Toepassen</i> — hoofdstuk 6 legt de tokens uit. Handig: een selectie kun je vanuit de tool als View/Sheet Set in het model opslaan, zodat collega's (en jijzelf volgende week) dezelfde set met één klik terughebben.</p>
+
+<h3>4.2 Stap 2 — Formaat</h3>
+<p>Zeven documenttegels bovenin; elke aangevinkte tegel doet mee in de export en toont zijn eigen instellingenpaneel. De panelen verschillen bewust per formaat — alleen wat de betreffende Revit-export écht ondersteunt staat erop, dus geen dode knoppen. Hoofdstuk 5 behandelt ze stuk voor stuk.</p>
+
+<h3>4.3 Stap 3 — Aanmaken</h3>
+<p>Kies de doelmap (omgevingsvariabelen zoals <code>%USERPROFILE%</code> werken), optioneel <b>submappen per formaat</b>, en het rapporttype. De jobtabel toont vooraf alles wat er gaat gebeuren, inclusief de overslagen met reden. Tijdens de run lopen de voortgangsbalk en de statuskolom live mee; na afloop staat er een samenvatting in het venster én een uitgebreide versie in het pyRevit-outputvenster, waar element-id's klikbaar zijn zodat je een probleemsheet direct kunt openen.</p>
+
+<div class="kader k-ok"><span class="lb">Zo herken je een goede run</span>
+<p>Alle regels op <i>Gereed</i>, overslagen alleen waar je ze verwacht (bv. IFC op sheets), de bestandsnamen exact volgens sjabloon, en het CSV-rapport in de doelmap met per regel een duur in seconden.</p>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>De zeven formaten onder de motorkap</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:12%">Formaat</th><th style="width:30%">API-klasse</th><th>Kern van het paneel</th></tr>
+<tr><td><b>PDF</b></td><td><code>PDFExportOptions</code></td><td>Kleur, rasterkwaliteit, dpi, papierformaat, oriëntatie, plaatsing (mm), zoom, zeven weergaveopties, los of gecombineerd</td></tr>
+<tr><td><b>DWG</b></td><td><code>DWGExportOptions</code></td><td>Exportinstelling uit het model, AutoCAD-versie, xrefs-optie</td></tr>
+<tr><td><b>DGN</b></td><td><code>DGNExportOptions</code></td><td>Geparkeerd (rode tegel): vereist een DGN-exportinstelling met seed-bestand; code en moduledetectie blijven aan boord</td></tr>
+<tr><td><b>DWF</b></td><td><code>DWFExportOptions</code> / <code>DWFXExportOptions</code></td><td>DWF of DWFx, beeldformaat/-kwaliteit, elementeigenschappen, cropbox</td></tr>
+<tr><td><b>NWC</b></td><td><code>NavisworksExportOptions</code></td><td>Coördinaten, eigenschappen, links, parts, ruimten — alleen 3D-views</td></tr>
+<tr><td><b>IFC</b></td><td><code>IFCExportOptions</code></td><td>IFC-versie, bestandstype, fase, ruimtegrenzen, psets, mappingbestand — alleen 3D-views</td></tr>
+<tr><td><b>IMG</b></td><td><code>ImageExportOptions</code></td><td>Pixelmaat of zoom-%, bestandstype per shaded/niet-shaded, dpi</td></tr>
+</table></div>
+
+<h3>5.1 PDF — het paradepaardje</h3>
+<p>Twee vondsten maken de PDF-export beter dan het oude printerdriver-model. De eerste is de <b>naamgevingstruc</b>: Revits eigen "losse bestanden"-modus negeert opgegeven bestandsnamen en hanteert zijn eigen naamregels. iExport exporteert daarom elke sheet als apart exportje mét <code>Combine=True</code> en een eigen <code>FileName</code> — technisch een "gecombineerde" PDF van één blad, praktisch: exact jouw sjabloonnaam.</p>
+
+<figure class="code"><figcaption>pdf.py — één sheet, eigen naam<span>python</span></figcaption>
+<pre><code class="lang-py">options.Combine = True               # per stuk "combineren"...
+options.FileName = filename          # ...zodat FileName gerespecteerd wordt
+ids = List[ElementId]([item.element_id])
+doc.Export(folder, ids, options)     # resultaat: {SheetNumber}_{SheetName}.pdf</code></pre></figure>
+
+<p>De tweede is de <b>vector/raster-keuze</b>. Native PDF-export tekent zoveel mogelijk in vectoren (scherp, klein bestand), maar bepaalde weergaven verliezen daarbij kleuren of arceringen. Het vinkje <i>Altijd raster gebruiken</i> zet <code>AlwaysUseRaster</code> aan: de hele pagina wordt dan gerenderd zoals op het scherm — de betrouwbare keuze wanneer kleur kritisch is, tegen een groter bestand. Kies je een vast papierformaat (bv. A3 voor een A1-tekening), dan komen plaatsing en zoom beschikbaar; bij <i>Bladformaat (automatisch)</i> blijven die bewust achterwege — zie het kader.</p>
+
+<div class="kader k-let"><span class="lb">Let op — guard G1</span>
+<p>Bij <code>PaperFormat.Default</code> zet iExport bewust géén plaatsing-, zoom- of offsetopties: een bekende bug in vroege Revit 2022-builds liet de export daarop stil weigeren, en inhoudelijk zijn die opties bij "papier = bladmaat" toch betekenisloos (100% = passend). Kosteloos veilig dus.</p>
+</div>
+
+<h3>5.2 DWG — setups uit het model; DGN — geparkeerd</h3>
+<p>DWG leunt op de exportinstellingen die je in Revit zelf beheert (lagenmapping, lijndikten, …). iExport leest die setups uit het model en biedt ze in een dropdown aan — de <code>IDG_DWG export setup</code> verschijnt daar dus vanzelf. Het vinkje <i>Views op sheets en links als externe referenties (xrefs)</i> gebruikt exact de Revit-bewoording; onder water is het de omkering van de API-eigenschap <code>MergedViews</code>, en in profielen wordt de oorspronkelijke sleutel bewaard zodat oude profielen blijven kloppen.</p>
+<p>DGN volgt hetzelfde setup-patroon, maar staat sinds v0.3.2 bewust <b>geparkeerd</b>: V8-DGN vereist een MicroStation-seedbestand dat alleen in een exportinstelling leeft, en die ontbreekt in de bedrijfstemplate. De tegel blijft zichtbaar in gedempt rood met uitleg in de tooltip; de exportercode en de moduledetectie blijven volledig aan boord, zodat heractiveren neerkomt op één regel code plus een exportinstelling in de template.</p>
+
+<h3>5.3 DWF, NWC en IMG — de bijzonderheden</h3>
+<p><b>DWF</b> kent twee smaken (DWF en het nieuwere DWFx) met elk hun eigen optieklasse; papier- en verbergopties uit het oude printtijdperk bestaan in de native export niet — de bladopmaak volgt gewoon de sheet. <b>NWC</b> vereist dat de Navisworks-exporter op de werkplek geïnstalleerd is; iExport detecteert dat via <code>OptionalFunctionalityUtils</code> en zet de taak anders zichtbaar op <i>Overgeslagen</i>. <b>IMG</b> heeft één eigenaardigheid: Revit plakt zelf " - viewtype - viewnaam" achter elke afbeeldingsnaam. Een hernoemstap direct na de export zet daar weer de sjabloonnaam voor terug.</p>
+
+<h3>5.4 IFC — export in een transactie</h3>
+<p>De IFC-exporter kan tijdens het exporteren gedeelde parameters in het model aanmaken en draait daarom in een eigen transactie die bij een fout netjes wordt teruggerold — het model blijft schoon. De geavanceerde instellingen (psets, mapping, splitsen per verdieping) gaan via <code>AddOption</code>-sleutelparen naar de exporter.</p>
+
+<div class="kader k-ok"><span class="lb">Verificatielabels — alle drie afgevoerd</span>
+<p>Drie plekken droegen tijdens de bouw een expliciet <i>smoketest-label</i>; de livetest van 24-08-2026 heeft ze stuk voor stuk afgevoerd. De DWF-aanroepvorm is bewezen door Revits eigen exportvalidatie (de "document is modifiable"-eis, opgelost met een transactie), de IFC-optiesleutels door een export die correct opent in Solibri, en de IMG-hernoemstap door een export met exact de sjabloonnaam. De <code>hasattr</code>/<code>try</code>-afscherming blijft als vangnet gewoon staan.</p>
+</div>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section class="hfd" id="h6">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">06</span><h2>Bestandsnamen en tokens</h2></div><span class="flens"></span></div>
+
+<p>Het sjabloonveld accepteert vaste tekst plus tokens tussen accolades. Bij <i>Toepassen</i> vult <code>naming.py</code> per rij de tokens in, verwijdert verboden tekens (<code>&lt; &gt; : " / \ | ? *</code>) en maakt dubbele namen uniek met een volgnummer. Een leeg resultaat valt terug op de sheetnaam, zodat er nooit een naamloos bestand ontstaat.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:26%">Token (EN)</th><th style="width:24%">NL-alias</th><th>Levert</th></tr>
+<tr><td><code>{SheetNumber}</code></td><td><code>{Bladnummer}</code></td><td>Bladnummer, bv. <code>E-101</code></td></tr>
+<tr><td><code>{SheetName}</code></td><td><code>{Bladnaam}</code></td><td>Bladnaam</td></tr>
+<tr><td><code>{ViewName}</code></td><td><code>{Viewnaam}</code></td><td>Viewnaam (bij view-export)</td></tr>
+<tr><td><code>{Revision}</code></td><td><code>{Revisie}</code></td><td>Huidige revisie van het blad</td></tr>
+<tr><td><code>{Size}</code></td><td><code>{Formaat}</code></td><td>Bladmaat-classificatie, bv. <code>A1 liggend</code></td></tr>
+<tr><td><code>{ProjectNumber}</code></td><td><code>{Projectnummer}</code></td><td>Projectnummer uit Project Information</td></tr>
+<tr><td><code>{ProjectName}</code></td><td><code>{Projectnaam}</code></td><td>Projectnaam</td></tr>
+<tr><td><code>{Date:yyyyMMdd}</code></td><td><code>{Datum:yyyyMMdd}</code></td><td>Datum in .NET-notatie, bv. <code>20260824</code></td></tr>
+<tr><td><code>{p:Parameternaam}</code></td><td>—</td><td>Willekeurige sheet-/viewparameter, bv. <code>{p:IDG_Bouwnummer}</code></td></tr>
+</table></div>
+
+<div class="oefening">
+<div class="kop">Voorbeeld: het huisrecept</div>
+<div class="body">
+<p>Sjabloon <code>{ProjectNumber}_{Bladnummer}_{Bladnaam}_{Datum:yyMMdd}</code> levert voor blad E-101 "Ventilatie BG" in project 24-088 op 24 augustus 2026: <code>24-088_E-101_Ventilatie BG_260824.pdf</code>. De NL-aliassen en de Engelse namen zijn vrij te mengen; profielen slaan intern altijd de Engelse vorm op.</p>
+</div>
+</div>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section class="hfd" id="h7">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">07</span><h2>Profielen</h2></div><span class="flens"></span></div>
+
+<p>Een profiel is de complete staat van alle drie de tabbladen — selectiemodus, sjabloon, aangevinkte formaten, élke instelling per formaat, doelmap-voorkeuren — als één JSON-bestand in <code>%APPDATA%\iExport\profielen</code>. Opslaan, laden en verwijderen zit rechtsboven in het venster. Typische inzet: één profiel "Weekset PDF+DWG" voor de vrijdagronde, één profiel "IFC coördinatie" voor het maandelijkse overleg.</p>
+
+<div class="kader k-tip"><span class="lb">Goed om te weten</span>
+<p>Elk profiel draagt een schemanummer. Nieuwe app-versies met extra instellingen lezen oude profielen gewoon in — ontbrekende sleutels krijgen hun standaardwaarde. Andersom waarschuwt de tool wanneer een profiel van een níeuwere schemaversie wordt geladen, in plaats van gokken.</p>
+</div>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section class="hfd" id="h8">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">08</span><h2>Statussen, rapport en foutafhandeling</h2></div><span class="flens"></span></div>
+
+<p>De filosofie is simpel: <b>alles wat de tool besluit, is zichtbaar</b>. Elke job doorloopt <i>Wachtrij → Bezig… → Gereed</i>, of eindigt in <i>Fout: reden</i> dan wel <i>Overgeslagen: reden</i>. Fouten in één taak raken de andere taken niet. Na de run schrijft <code>report.py</code> desgewenst een CSV (puntkomma-gescheiden, UTF-8 met BOM — direct goed in Excel) met per regel nummer, naam, formaat, status, bestandspad en duur. Het pyRevit-outputvenster toont dezelfde samenvatting met klikbare element-id's.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Symptoom</th><th>Betekenis / actie</th></tr>
+<tr><td><i>Overgeslagen: alleen 3D-views (IFC)</i></td><td>Verwacht gedrag: IFC/NWC exporteren modelgeometrie, geen bladen. Selecteer een 3D-view voor die formaten.</td></tr>
+<tr><td><i>Overgeslagen: Navisworks-exporter niet geïnstalleerd</i></td><td>De gratis NWC-exportutility (of Navisworks zelf) ontbreekt op deze werkplek.</td></tr>
+<tr><td><i>Fout: Revit weigerde de export</i></td><td>De API gaf <code>False</code> terug — meestal een gesloten/ongeldige view of schrijfrechten. Het outputvenster geeft de details.</td></tr>
+<tr><td>Bestandsnaam eindigt op <code>_2</code></td><td>Twee rijen kregen via het sjabloon dezelfde naam; de tool maakte ze automatisch uniek.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 9 ==================== -->
+<section class="hfd" id="h9">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">09</span><h2>Installatie en beheer</h2></div><span class="flens"></span></div>
+
+<p>iExport bestaat uit twee delen die samen moeten verhuizen: de pushbutton (schil) en het <code>iexport</code>-pakket (motor). In de IDG Toolbar ziet de doelstructuur er zo uit:</p>
+
+<div class="tree"><b>IDG.extension/</b>
+├── <b>lib/</b>
+│   └── <b>iexport/</b>                <i>&larr; motor: const.py, models.py, exporters/, …</i>
+└── <b>IDG.tab/</b>
+    ├── bundle.yaml             <i>&larr; layout-lijst; entry "08_iExport" (zonder suffix)</i>
+    └── <b>08_iExport.panel/</b>
+        └── <b>iExport.pushbutton/</b>
+            ├── bundle.yaml · script.py · ui.xaml</div>
+
+<p>Het script vindt de motor zelf: eerst via de extensie-<code>lib</code> (pyRevit zet die op het pad), anders via een relatieve terugval vanaf de knopmap. Een tweede installatievorm — iExport als eigen losse extensie — staat beschreven in de README van het pakket.</p>
+
+<div class="kader k-let"><span class="lb">Let op — de reload-vuistregel</span>
+<p>Nieuwe bundles, panelen of yaml-wijzigingen: <b>Revit volledig afsluiten en koud starten</b>. Alleen codewijzigingen in een bestaand script: pyRevit-Reload volstaat. De Reload-functie herbouwt de sessie in een draaiende Revit en is precies op het moment dat de boomstructuur verandert het fragielst — in de praktijk tot een harde crash aan toe (exceptiecode <code>0xe0434352</code> tijdens de afbraakfase). Een panel dat na een koude start niet verschijnt heeft vrijwel altijd een structuuroorzaak: Revit verbergt panelen zonder geldig geladen knop, dus controleer op dubbele mapniveaus uit een uitgepakte zip.</p>
+</div>
+
+<p>Bij hardnekkige laadproblemen: <code>pyrevit caches clear --all</code> in een terminal, daarna koud starten — zo weet je zeker dat je vers laadt en geen restant van een gecrashte sessie najaagt.</p>
+</section>
+
+<!-- ==================== 10 ==================== -->
+<section class="hfd" id="h10">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">10</span><h2>Het bouwverhaal: fasen en beslissingen</h2></div><span class="flens"></span></div>
+
+<p>iExport is in afgebakende fasen gebouwd, elk met een eigen oplevering en kwaliteitscontrole. <b>Fase 0</b> (v0.1) zette het complete geraamte neer: de driestaps-wizard, de motor/schil-scheiding, PDF, DWG en IFC werkend, profielen, rapportage en voortgang — met de vier resterende formaten als zichtbare "volgt nog"-plekken in plaats van verborgen gaten. <b>Fase 1</b> (v0.2 t/m v0.3.2) maakte de formaatdekking compleet — DWF, NWC, DGN en IMG werden echte exporters met echte panelen, het PDF-paneel kreeg papierformaat, oriëntatie, plaatsing in mm, zoom en dpi-kwaliteit, en de naamtokens kregen Nederlandse aliassen — en werd afgesloten met een volledige live-smoketest op Revit 2024, waarin onderweg de opstarttijd van twee minuten naar één seconde ging (één titleblock-pass in plaats van per-sheet collectors), DWF een transactiefix kreeg en DGN bewust werd geparkeerd.</p>
+
+<h3>10.1 De vastgelegde beslissingen</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:10%">Nr.</th><th>Beslissing</th></tr>
+<tr><td><b>D1</b></td><td>Bouwen in pyRevit/IronPython; een C#-port pas ná een bewezen, gesmoketeste functionaliteit (de motor is er al op voorbereid).</td></tr>
+<tr><td><b>D2</b></td><td>Gecombineerde PDF standaard <i>uit</i> — losse bladen per revisie is de tekenkamerpraktijk.</td></tr>
+<tr><td><b>D3</b></td><td>Nederlandse tokenaliassen naast de Engelse; profielen slaan canoniek Engels op.</td></tr>
+<tr><td><b>D4</b></td><td>"Afbeeldingen combineren tot één HTML" geschrapt: marginaal, en batchwerk is per definitie losse bestanden.</td></tr>
+<tr><td><b>D5</b></td><td>DGN geparkeerd: zichtbaar rode, niet-activeerbare tegel met toelichting; vereist een DGN-exportinstelling met seed-bestand in de template. Code en detectie blijven aan boord voor een eventuele toekomstige versie.</td></tr>
+<tr><td><b>G1</b></td><td>Bij automatisch papierformaat geen plaatsing/zoom zetten (bekend stil-faalpad; inhoudelijk kosteloos).</td></tr>
+</table></div>
+
+<h3>10.2 Kwaliteitscontrole in drie lagen</h3>
+<p>Elke oplevering doorloopt drie controlelagen. <b>Statisch</b>: alle modules compileren, de XAML valideert, en drie kruiscontroles bewijzen dat elke schermnaam, elke eventkoppeling en elke instellingensleutel aan beide kanten bestaat — in beide richtingen, nul mismatches. <b>Mock-rig</b>: de motor draait buiten Revit tegen nagebootste API-objecten voor de logicapaden. <b>Live smoketest</b>: elk formaat één echte export in Revit 2024. Die is op 24-08-2026 volledig doorlopen; de eindstand staat hieronder.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:16%">Onderdeel</th><th style="width:12%">Resultaat</th><th>Bevinding</th></tr>
+<tr><td>PDF — standaard</td><td>✓</td><td>Losse bestanden met exact de sjabloonnamen (Combine+FileName-truc bewezen).</td></tr>
+<tr><td>PDF — raster</td><td>✓</td><td><code>AlwaysUseRaster</code> levert het verwachte WYSIWYG-resultaat bij kleurkritische bladen.</td></tr>
+<tr><td>PDF — vast formaat + zoom</td><td>✓</td><td>A0-blad naar A3 met 50% zoom: paginamaat exact 420,0 × 297,0 mm (pdfinfo), inhoud correct geknipt rond het midden. Guard G1-pad zonder stil faalgedrag; 50% is de exacte A0→A2-factor, passend op A3 is 35,3% of "Passend op pagina".</td></tr>
+<tr><td>PDF — gemengde formaten</td><td>✓</td><td>Meerdere sheets met verschillende papierformaten in één run — structureel gevolg van één export-aanroep per blad.</td></tr>
+<tr><td>DWG</td><td>✓</td><td>Eerste liveformaat; exportsetup uit het model gebruikt.</td></tr>
+<tr><td>IFC</td><td>✓</td><td>3D-dakexport opent correct in Solibri; transactie-aanpak en optiesleutels bevestigd.</td></tr>
+<tr><td>DWF</td><td>✓</td><td>Vereist tegen de intuïtie in een <i>bewerkbaar</i> document; opgelost met een transactie die altijd wordt teruggerold. De oorspronkelijke foutmelding bewees en passant de juiste aanroepvorm.</td></tr>
+<tr><td>IMG</td><td>✓</td><td>Bestandsnaam exact volgens sjabloon — de hernoemstap vangt Revits aangeplakte achtervoegsel af.</td></tr>
+<tr><td>NWC</td><td>✓</td><td>Werkend na installatie van de NWC Export Utility; moduledetectie geeft anders een zichtbare overslag.</td></tr>
+<tr><td>DGN</td><td>⏸</td><td>Module aanwezig, export geweigerd zonder seed-setup; per D5 geparkeerd met rode tegel en uitleg.</td></tr>
+<tr><td>Profielen</td><td>✓</td><td>Opslaan, heropenen en herladen inclusief nieuwe Fase-1-velden en het geïnverteerd opgeslagen xrefs-vinkje.</td></tr>
+<tr><td>Opstarttijd</td><td>✓</td><td>Van ± 2 minuten naar ± 1 seconde na de titleblock-pass en het venster-eerst-laden.</td></tr>
+</table></div>
+
+<p><b>Prestatienotitie PDF.</b> Een volle A0 op 300 dpi kost ± 20 seconden per blad; die tijd zit vrijwel volledig in Revits eigen bladrendering. Voor conceptrondes zijn 144 of 72 dpi (en raster uit) een veelvoud sneller. Structureel wint Fase 2 hier met Revits naamregels-API: één export-aanroep voor de hele set in plaats van één per blad — het CSV-rapport logt de duur per taak, dus de winst is straks direct meetbaar.</p>
+</section>
+
+<!-- ==================== 11 ==================== -->
+<section class="hfd" id="h11">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">11</span><h2>Vooruitblik</h2></div><span class="flens"></span></div>
+
+<p>Met Fase 1 afgerond ligt de weg open naar verdieping. Het bouwplan (<code>docs/PLAN.md</code>) beschrijft de vervolgfasen in detail; de hoofdlijn: <b>Fase 2</b> verdiept de bestaande formaten, met als eerste kandidaat Revits naamregels-API (<code>SetNamingRule</code>) — één export-aanroep voor de hele set in plaats van één per blad, met de smoketest-meting van ± 20 seconden per A0 als concrete aanleiding — naast een sleepbare paginavolgorde voor de gecombineerde PDF en extra DWG-opties. <b>Fase 3</b> richt zich op werkcomfort: onthouden van laatste keuzes, sneltoetsen, slimmere standaarden per project. <b>Fase 4</b> is distributie en versiebeheer richting meerdere werkplekken. <b>Fase 5</b> is de optionele C#-port — met als bonus dat de UI-vrije motor dan ook de bestaande headless batch-export kan voeden: één exportkern, twee gezichten (interactieve wizard en achtergrondverwerking).</p>
+</section>
+
+<!-- ==================== 12 ==================== -->
+<section class="hfd" id="h12">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">12</span><h2>Naslag: module-overzicht</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:30%">Module</th><th>Verantwoordelijkheid</th></tr>
+<tr><td><code>const.py</code></td><td>Alle vaste gegevens: versienummer, formaatdefinities, combolijsten, statusteksten, tokenaliassen. Wijzig hier, nooit verspreid door de code.</td></tr>
+<tr><td><code>models.py</code></td><td><code>ItemRow</code> en <code>JobRow</code> met changenotificatie voor de schermtabellen.</td></tr>
+<tr><td><code>collect.py</code></td><td>Sheets, views, View/Sheet Sets en fasen uit het model, met per-element foutregistratie en bladmaat in mm.</td></tr>
+<tr><td><code>naming.py</code></td><td>Tokens (EN+NL) → veilige, unieke bestandsnamen.</td></tr>
+<tr><td><code>papersize.py</code></td><td>Breedte×hoogte (mm) → "A1 liggend" of "Aangepast (b×h mm)".</td></tr>
+<tr><td><code>profiles.py</code></td><td>Profielen als JSON: lijst, laden, opslaan, verwijderen, schemabewaking.</td></tr>
+<tr><td><code>report.py</code></td><td>CSV-rapport, Excel-vriendelijk.</td></tr>
+<tr><td><code>wpfutil.py</code></td><td>Voortgang live houden tijdens de run; panelen tonen/verbergen.</td></tr>
+<tr><td><code>exporters/</code></td><td>Per formaat één module met <code>validate()</code> en <code>export_item()</code>; <code>__init__.py</code> bevat registry, jobopbouw en <code>run_jobs()</code>.</td></tr>
+<tr><td><code>script.py</code></td><td>Vensterklasse: events, instellingen-maps, profielkoppeling, run-knop.</td></tr>
+<tr><td><code>ui.xaml</code></td><td>Het volledige venster: layout, stijlen, bindings.</td></tr>
+</table></div>
+
+<h3>12.1 Documenthistorie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:14%">Versie</th><th style="width:20%">Datum</th><th>Wijziging</th></tr>
+<tr><td>1.0</td><td>24-08-2026</td><td>Eerste uitgave, dekt app-versie 0.2 (Fase 1).</td></tr>
+<tr><td>1.1</td><td>24-08-2026</td><td>Fase 1 afgerond: volledige smoketest-eindstand in §10.2, DGN geparkeerd (D5), transactiefix DWF, opstartversnelling en prestatienotities verwerkt. Dekt app-versie 0.3.2.</td></tr>
+</table></div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · iExport — van idee tot uitvoering · IDG-UITL-IEXP v1.1</span>
+  <span>&copy; 2026 Bram de Jong — priv&eacute; ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

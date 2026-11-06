@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDG Toolbar — Uitleg van de scripts (bundel)</title>
+<meta name="description" content="Korte omschrijving voor zoekmachines/preview.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar &middot; interne handleiding</span>
+  <h1>Uitleg van de scripts &mdash; verzamelbundel</h1>
+  <p class="sub">Alle scriptuitleg van de IDG Toolbar in &eacute;&eacute;n document: per script een eigen hoofdstuk, in gewone taal, met de vragen uit de tekenkamer erbij. Geschreven voor de tekenkamer, niet voor programmeurs.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-BUNDEL</b></span>
+    <span>Versie <b>1.0</b></span>
+    <span>Omvat <b>8 scripts</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Over dit document</h2></div><span class="flens"></span></div>
+
+<p>Tot nu toe had elk script zijn eigen uitlegdocument. Dat werkte, maar je was steeds aan het springen tussen bestanden: de basisbegrippen stonden in het ene document, de v1.1-mechanieken in het andere. Vanaf nu staat alles hier &mdash; &eacute;&eacute;n bestand, &eacute;&eacute;n hoofdstuk per script, en verwijzingen zijn gewoon interne &sect;-verwijzingen binnen dit document.</p>
+
+<p>Elk hoofdstuk is opgebouwd zoals je gewend bent: eerst wat het script doet, dan de begrippen en de opbouw, dan de functie-voor-functie referentie, en als afsluiter de vragen uit de tekenkamer met antwoord. Je hoeft dus niet van voor naar achter te lezen &mdash; pak het hoofdstuk van het script waar je mee bezig bent.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:12%">Hoofdstuk</th><th style="width:30%">Script / knop</th><th style="width:12%">Versie</th><th>In &eacute;&eacute;n zin</th></tr>
+<tr><td><strong>02</strong></td><td>Opstellingen</td><td>v3.1</td><td>Maakt per gekozen Mechanical&nbsp;Equipment-unit automatisch doorsnede, plattegrond en sheet aan.</td></tr>
+<tr><td><strong>03</strong></td><td>Dependent views (CVAD)</td><td>v1.1</td><td>Maakt van elke gekozen view voor elke gekozen scope box een dependent view, met de scope box direct toegepast.</td></tr>
+<tr><td><strong>04</strong></td><td>3D views / Scope Boxes</td><td>v1.1</td><td>Kopieert elke gekozen 3D-view per scope box, met de section box op het kader van die scope box.</td></tr>
+<tr><td><strong>05</strong></td><td>Tag Ducts &middot; Tag Air Terminals &middot; Tag Duct Fittings &middot; Tag Rooms</td><td>v1.1</td><td>Vier knoppen die per view automatisch taggen met de juiste IDG-tagfamilie, zonder duplicaten.</td></tr>
+<tr><td><strong>06</strong></td><td>SheetList &mdash; Tekeningenlijst</td><td>v1.2</td><td>WPF-venster met zoekbalk om "Appears In Sheet List" per sheet snel aan of uit te zetten.</td></tr>
+</table></div>
+
+<div class="kader k-tip"><span class="lb">Goed om te weten</span>
+<p>De hoofdstukken 02 t/m 06 komen &eacute;&eacute;n-op-&eacute;&eacute;n uit de losse uitlegdocumenten (IDG-UITL-OPST v1.0, IDG-UITL-CVAD v1.1, IDG-UITL-3DSB v1.1, IDG-UITL-TAGS v1.1, IDG-UITL-SHTL v1.2). De inhoud is ongewijzigd; alleen de nummering en de onderlinge verwijzingen zijn omgezet naar dit bundelformaat. Deze bundel vervangt de losse bestanden.</p>
+</div>
+
+<p>De algemene programmeerbasis &mdash; variabelen, functies, CONFIG, try/except, lambda, het verschil tussen Python, IronPython en Dynamo &mdash; staat &eacute;&eacute;n keer uitgelegd, in hoofdstuk&nbsp;02 (&sect;2.2 en &sect;2.3). De andere hoofdstukken bouwen daarop voort en leggen alleen uit wat eigen is aan hun script.</p>
+</section>
+
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Het Opstellingen-script</h2></div><span class="flens"></span></div>
+<!-- ==================== 1 ==================== -->
+<section>
+<h3>2.1 Wat doet dit script?</h3>
+
+<p>Je selecteert in een lijst één of meer Mechanical&nbsp;Equipment-units (bijv. WTW-units) die een <code>IDG_Bouwnummer</code> hebben. Het script maakt daarna per unit automatisch aan wat jij aanvinkt: een <strong>doorsnede</strong> ("Opstelling&nbsp;-&nbsp;&lt;bouwnummer&gt;"), een <strong>plattegrond</strong> ("Plattegrond&nbsp;&lt;bouwnummer&gt;", met view template en exact dezelfde uitsnede als de doorsnede) en/of een <strong>sheet</strong> (titleblock <code>00_IDG_kader</code>, nummering "Opst&nbsp;1, Opst&nbsp;2, …" doorlopend na bestaande nummers, plattegrond links en doorsnede rechtsboven). Wat al bestaat wordt overgeslagen, en aan het eind krijg je een rapport: wat is aangemaakt, wat is overgeslagen, en waar iets misging.</p>
+
+<h3>2.1.1 De negen stappen van de hoofdroutine</h3>
+<ol>
+<li><strong>Verzamelen</strong> — alle Mechanical Equipment in het model ophalen.</li>
+<li><strong>Selecteren</strong> — keuzelijst: één totaallijst met een "Verdieping"-filter; units mét bouwnummer staan voorgevinkt.</li>
+<li><strong>Outputs kiezen</strong> — doorsnedes, plattegronden, sheets (1, 2 of alle 3).</li>
+<li><strong>Filteren op bouwnummer</strong> — units zonder <code>IDG_Bouwnummer</code> gaan niet mee (wél zichtbaar in het eindrapport).</li>
+<li><strong>Resources ophalen</strong> — alléén wat nodig is: 3D-view (muurdetectie), view-types, template, titleblock. Ontbreekt iets essentieels, dan stopt het script netjes met een melding.</li>
+<li><strong>Groeperen</strong> — units met hetzelfde bouwnummer krijgen een suffix A/B/C, zodat viewnamen uniek blijven.</li>
+<li><strong>Bestaande namen inventariseren</strong> — welke views en sheets bestaan al, en wat is het hoogste bestaande "Opst"-nummer.</li>
+<li><strong>Aanmaken</strong> — alles binnen <strong>één transactie</strong> (zie 2.4): per unit doorsnede, plattegrond en/of sheet.</li>
+<li><strong>Rapporteren</strong> — overzicht in het pyRevit-uitvoervenster: aantallen, sheets, overgeslagen items, fouten.</li>
+</ol>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Het script is <strong>idempotent</strong>: views en sheets die al bestaan worden overgeslagen (<code>SKIP_EXISTING</code>). Twee keer draaien levert dus nooit dubbele views of sheets op.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section>
+<h3>2.2 Basisbegrippen — de bouwstenen</h3>
+
+<h3>2.2.1 Wat is een variabele?</h3>
+<p>Een variabele is een <strong>naam voor een waarde</strong>, zodat je die later kunt hergebruiken. Vergelijk het met een parameter in Revit: <code>IDG_Bouwnummer = "B1-04"</code> in Revit is hetzelfde idee als <code>bouwnr = "B1-04"</code> in Python. Naam links, waarde rechts — en overal waar daarna <code>bouwnr</code> staat, wordt die waarde gebruikt.</p>
+
+<h3>2.2.2 Wat is een functie?</h3>
+<p>Een functie is een <strong>herbruikbaar blok code met een naam</strong>: je roept hem aan met invoer en krijgt (meestal) een resultaat terug. <code>mm_to_ft(1000.0)</code> betekent: "voer het blok <code>mm_to_ft</code> uit met 1000 als invoer". Functies bestaan om twee redenen: dezelfde logica hoef je maar één keer te schrijven, en de naam documenteert wat er gebeurt. Daardoor lees je <code>main()</code> als een stappenplan in plaats van als 1000 regels brij.</p>
+
+<h3>2.2.3 Waarom constanten (CONFIG) bovenaan?</h3>
+<p>Bovenin staat een <code>#&nbsp;CONFIG</code>-blok met namen in HOOFDLETTERS: <code>PLAN_TEMPLATE_NAME</code>, <code>TITLEBLOCK_FAMILY</code>, marges in mm, enzovoort. Drie redenen:</p>
+<ol>
+<li><strong>Aanpasbaar zonder programmeerkennis.</strong> Verandert het template of de titleblock ooit, dan pas je één regel bovenin aan — niet zoeken in 1000 regels code. Het CONFIG-blok is het instellingenpaneel van het script.</li>
+<li><strong>Geen "magic numbers".</strong> Een losse <code>50.0</code> midden in de code zegt niemand iets; <code>MARGIN_RIGHT_MM = 50.0</code> mét commentaar ("de IDG-kader heeft de stempel rechtsonder") legt het vast.</li>
+<li><strong>Eén waarheid.</strong> Wordt een waarde op drie plekken gebruikt, dan is er maar één plek waar hij gedefinieerd is.</li>
+</ol>
+<p>De hoofdletters zijn een Python-afspraak: HOOFDLETTERS&nbsp;= "dit is een instelling, wijzig alleen hier".</p>
+
+<h3>2.2.4 Waarom try en except?</h3>
+<p><code>try</code>/<code>except</code> betekent: "<strong>probeer</strong> dit, en als het misgaat, <strong>vang de fout op</strong> in plaats van te crashen." Het script gebruikt dit op drie manieren:</p>
+<ol>
+<li><strong>Per unit, in de hoofdlus.</strong> Verwerk je 40 units en heeft unit 12 kapotte geometrie, dan stopt zonder try/except het héle script daar — de andere 28 worden nooit gemaakt. Mét try/except wordt de fout genoteerd in de foutenlijst en gaat het script door met unit 13. Aan het eind zie je precies: "38 gelukt, 2 fouten, en dit waren ze."</li>
+<li><strong>Rond onbetrouwbare Revit-eigenschappen</strong> (bijv. <code>s.Family.Name</code>). Sommige elementen geven een fout zodra je een eigenschap opvraagt (corrupte elementen, systeemfamilies, gelinkte content). Het script vangt dat op en gaat verder met een veilige terugvalwaarde.</li>
+<li><strong>Voor versieverschillen.</strong> <code>UnitTypeId</code> bestaat pas vanaf Revit 2021. Het script <em>probeert</em> die te importeren; lukt dat niet, dan valt het terug op het oude <code>DisplayUnitType</code>. Zo draait één script op alle Revit-versies op kantoor.</li>
+</ol>
+<figure class="code"><figcaption>patroon 1 — per element, nooit de batch afbreken<span>python</span></figcaption>
+<pre><code class="lang-py">for unit, bouwnr, suffix in work_items:
+    try:
+        # ... doorsnede / plattegrond / sheet aanmaken ...
+        pass
+    except Exception as ex:
+        errors.append("{}: {}".format(bouwnr, ex))   # noteren, doorgaan</code></pre></figure>
+<p>Belangrijk detail: het script gebruikt altijd <code>except Exception as ex</code> (de fout wordt bewaard en gerapporteerd) en op cruciale plekken nooit een "kale" <code>except:</code> die fouten geruisloos wegslikt.</p>
+
+<div class="kader k-tip"><span class="lb">En de transactie dan?</span>
+<p>Alles wat het script in het model wijzigt, gebeurt binnen <code>with revit.Transaction("Opstellingen aanmaken"):</code>. Dat is het vangnet op <strong>modelniveau</strong>: gaat er iets fundamenteel mis, dan draait Revit álle wijzigingen automatisch terug en blijft het model schoon. Bovendien is het hele resultaat daardoor <strong>één keer Ctrl+Z</strong> in plaats van honderd losse stappen. Try/except vangt de kleine fouten per element; de transactie beschermt het model als geheel.</p>
+</div>
+
+<h3>2.2.5 Wat is een lambda-functie?</h3>
+<p>Een lambda is een <strong>mini-functie zonder naam, van één regel</strong>, gebruikt op de plek waar je hem nodig hebt. En ja: dit bestaat gewoon in IronPython — het is kern-Python-syntaxis. Dit script bevat er drie, alle drie als sorteersleutel:</p>
+<figure class="code"><figcaption>de drie lambdas in dit script — allemaal sorteersleutels<span>python</span></figcaption>
+<pre><code class="lang-py"># keuzelijst sorteren op label
+groups[k].sort(key=lambda it: it.name)
+
+# units met hetzelfde bouwnummer: vaste volgorde op ElementId
+group_units.sort(key=lambda e: e.Id.IntegerValue)
+
+# het werk sorteren op (bouwnummer, suffix)
+work_items.sort(key=lambda it: (it[1], it[2]))</code></pre></figure>
+<p>Waarom een lambda en geen gewone functie? <code>sort()</code> verwacht als <code>key</code> een functie die zegt <em>waarop</em> gesorteerd moet worden. Voor iets van één regel dat maar op één plek gebruikt wordt, is een aparte functie met <code>def</code> en een naam onnodig omslachtig. <code>lambda e: e.Id.IntegerValue</code> leest als: "gegeven element <code>e</code>, geef het getal van zijn Id terug" — dáárop wordt gesorteerd.</p>
+<div class="kader k-tip"><span class="lb">Waarom sorteren op ElementId?</span>
+<p>Zodat de A/B/C-suffixes <strong>deterministisch</strong> zijn: draai het script morgen opnieuw en dezelfde unit krijgt weer dezelfde letter. Zonder vaste sortering kon de volgorde per run verschillen.</p>
+</div>
+
+<h3>2.2.6 Wat is Pylint?</h3>
+<p>Pylint is een <strong>controleprogramma voor Python-code</strong> (een "linter"). Het draait je script niet, maar leest de code en waarschuwt voor: ongebruikte variabelen, typefouten in namen (die pas crashen als die regel toevallig uitgevoerd wordt), stijlafwijkingen (PEP&nbsp;8), te lange functies. Vergelijk het met Revit-warnings: het model werkt nog, maar de melding wijst op iets dat je beter kunt oplossen.</p>
+<div class="kader k-let"><span class="lb">Let op bij pyRevit</span>
+<p>Pylint kent <code>Autodesk.Revit.DB</code> en de pyRevit-modules niet en meldt daarom altijd een aantal onterechte "import kan niet gevonden worden"-fouten. Die mag je negeren; de overige waarschuwingen zijn wél waardevol.</p>
+</div>
+
+<h3>2.2.7 Wat betekent if __name__ == "__main__" onderaan?</h3>
+<p>De standaard-Python-manier om te zeggen: "voer <code>main()</code> alleen uit als dit bestand zélf gestart wordt" — wat pyRevit doet als je op de knop klikt. Zou een ander script dit bestand ooit <em>importeren</em> om een hulpfunctie te hergebruiken, dan start <code>main()</code> niet ongevraagd. De aan/uit-knop van het script.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section>
+<h3>2.3 Python, IronPython en Dynamo — het verschil</h3>
+
+<p>Alle drie spreken ze de taal Python, maar het "motorblok" eronder verschilt — en dat bepaalt wat je wel en niet kunt.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Python (CPython)</th><th>IronPython</th><th>Dynamo Python-node</th></tr>
+<tr><td><strong>Wat is het?</strong></td><td>De "gewone" Python van python.org</td><td>Python nagebouwd op Microsofts .NET-platform</td><td>Een Python-blokje <em>binnen</em> een Dynamo-grafiek</td></tr>
+<tr><td><strong>Draait op</strong></td><td>Eigen runtime</td><td>.NET — dezelfde runtime als Revit zelf</td><td>IronPython óf CPython3, gekozen in de node</td></tr>
+<tr><td><strong>Praat met Revit?</strong></td><td>Niet rechtstreeks</td><td><strong>Ja, native</strong> — daarom gebruikt pyRevit het</td><td>Ja, via Dynamo's tussenlaag (wrappers, <code>UnwrapElement</code>, transacties door Dynamo beheerd)</td></tr>
+<tr><td><strong>Versie in ons werk</strong></td><td>3.x (modern)</td><td><strong>2.7</strong> — dit script is dus Python 2.7-stijl</td><td>Wisselend per Dynamo-versie</td></tr>
+<tr><td><strong>Externe pakketten</strong></td><td>Volledig ecosysteem</td><td>Nee (wel alle .NET-bibliotheken)</td><td>Beperkt</td></tr>
+<tr><td><strong>Typisch gebruik</strong></td><td>Losse tools, data</td><td><strong>pyRevit-scripts zoals dit</strong></td><td>Grafiek-experimenten, one-offs</td></tr>
+</table></div>
+
+<h3>2.3.1 De drie gevolgen die je in dít script terugziet</h3>
+<ol>
+<li><strong>Geen f-strings.</strong> IronPython&nbsp;2.7 kent <code>f"tekst {waarde}"</code> niet; daarom staat overal <code>"tekst {}".format(waarde)</code>. Geen ouderwetse voorkeur — een harde eis van de omgeving.</li>
+<li><strong>Transacties zelf beheren.</strong> In Dynamo regelt Dynamo de transactie; in pyRevit doet het script dat zelf — vandaar het <code>with revit.Transaction(...)</code>-blok.</li>
+<li><strong>Rechtstreekse API-toegang.</strong> <code>from Autodesk.Revit.DB import ...</code> zijn letterlijk dezelfde klassen als in C#. De officiële Revit&nbsp;API-documentatie geldt hier één-op-één, zonder Dynamo-vertaalslag.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Kortom</span>
+<p>Dynamo-Python en pyRevit-Python zijn <strong>dezelfde taal</strong>, maar pyRevit staat dichter op de Revit&nbsp;API — krachtiger én verantwoordelijker: transacties, fouten en versies handel je zelf af. Precies wat dit script overal doet.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section>
+<h3>2.4 Functie-voor-functie referentie</h3>
+
+<p>Gegroepeerd zoals in het script. Namen met een underscore-prefix (<code>_norm_param_name</code>) zijn "intern": hulpjes voor andere functies, niet bedoeld voor los gebruik.</p>
+
+<h3>2.4.1 Eenheden</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>mm_to_ft(mm)</code></td><td>Rekent millimeters om naar Revits interne eenheid (decimale voet). <strong>Alle maten in dit script staan in mm</strong>; alleen op het laatste moment wordt omgerekend. Kiest automatisch de moderne (<code>UnitTypeId</code>, Revit&nbsp;2021+) of oude (<code>DisplayUnitType</code>) methode.</td></tr>
+</table></div>
+
+<h3>2.4.2 Opzoeken (lookups)</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_section_view_family_type</code></td><td>Zoekt het eerste view-type "Section" — nodig om een doorsnede te kúnnen maken.</td></tr>
+<tr><td><code>get_floor_plan_view_family_type</code></td><td>Idem, voor "Floor Plan".</td></tr>
+<tr><td><code>get_view_template_by_name</code></td><td>Zoekt het view template op naam (CONFIG). Bestaat het niet → waarschuwing, maar het script gaat door zonder template.</td></tr>
+<tr><td><code>get_titleblock_symbol</code></td><td>Zoekt de titleblock op familie- én typenaam. Leest de typenaam op twee manieren (parameter én <code>.Name</code>), omdat niet elke versie/familie beide betrouwbaar geeft.</td></tr>
+<tr><td><code>list_titleblocks</code></td><td>Lijst "Familie&nbsp;:&nbsp;Type" van álle geladen titleblocks — alleen gebruikt in de foutmelding, zodat je meteen ziet wat er wél is.</td></tr>
+<tr><td><code>get_level_elevation</code></td><td>Peilhoogte van een level (interne eenheden).</td></tr>
+<tr><td><code>get_unit_level_id</code></td><td>Op welk level staat de unit? Probeert eerst de gewone level-parameter, dan de schedule-level — families verschillen hierin.</td></tr>
+<tr><td><code>get_level_name</code></td><td>Naam van een level, of <code>None</code> — voor de labels in de keuzelijst.</td></tr>
+</table></div>
+
+<h3>2.4.3 Unit-informatie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_unit_center</code></td><td>Middelpunt van de unit via de bounding box; anders het plaatsingspunt. Het anker voor alle geometrie.</td></tr>
+<tr><td><code>get_idg_bouwnummer</code></td><td>Leest <code>IDG_Bouwnummer</code>: eerst op de <strong>instance</strong>, dan op het <strong>type</strong>. Leeg of alleen spaties telt als "geen bouwnummer".</td></tr>
+<tr><td><code>get_unit_type_label</code></td><td>Label "Familie&nbsp;:&nbsp;Type" voor de keuzelijst; "?" als dat niet lukt — in plaats van crashen op één rare family.</td></tr>
+</table></div>
+
+<h3>2.4.4 Muurdetectie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>find_first_wall_distance</code></td><td>Schiet een onzichtbare "laserstraal" (raycast) vanuit de unit en meet de afstand tot de <strong>eerste muur</strong> — ook in gelinkte modellen. <code>None</code> als er binnen 50&nbsp;m niets geraakt wordt.</td></tr>
+<tr><td><code>get_or_find_3d_view</code></td><td>Raycasten kan alleen vanuit een 3D-view: pakt de eerste bestaande, of maakt er één aan.</td></tr>
+</table></div>
+<div class="kader k-tip"><span class="lb">Waarom muurdetectie?</span>
+<p>De doorsnede en plattegrond moeten precies <strong>van muur tot muur</strong> lopen. Het script meet links en rechts van de unit de afstand tot de dichtstbijzijnde muur (+200&nbsp;mm overschot zodat de muur zelf in beeld is). Geen muur gevonden → terugval op 2000&nbsp;mm.</p>
+</div>
+
+<h3>2.4.5 Geometrie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>compute_geometry</code></td><td>Het rekenhart. Bepaalt in één keer, voor doorsnede én plattegrond samen: kijkrichting (uit <code>FacingOrientation</code>, plat geprojecteerd), middelpunt, level, muurafstanden links/rechts — en bouwt daaruit de gedraaide bounding box voor de doorsnede (300&nbsp;mm onder peil tot 4000&nbsp;mm hoog, kijkdiepte 2200&nbsp;mm, camera 1&nbsp;m vóór de unit). De raycasts gebeuren zo maar één keer per unit.</td></tr>
+<tr><td><code>set_plan_crop_shape</code></td><td>Zet op de plattegrond een <strong>gedraaide rechthoekige crop</strong> met exact dezelfde voetafdruk als de doorsnede (muur-tot-muur breed, 1200&nbsp;mm achter tot 1000&nbsp;mm vóór de unit). Gebruikt bewust <code>SetCropShape()</code> met een CurveLoop — een gedraaide CropBox interpreteert Revit bij plan views verkeerd. Probeert beide draairichtingen van de rechthoek.</td></tr>
+<tr><td><code>hide_crop_region</code></td><td>Crop áán, maar de croprand <strong>onzichtbaar</strong> — nette views zonder kaderlijn.</td></tr>
+</table></div>
+
+<h3>2.4.6 Suffixen en bestaande namen</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>suffix_for_index</code></td><td>0, 1, 2, … → "A", "B", "C", … en na "Z" door naar "AA", "AB" (zoals Excel-kolommen). Voor dubbele bouwnummers.</td></tr>
+<tr><td><code>collect_existing_view_names</code></td><td>Alle bestaande viewnamen (kleine letters — Revit-namen zijn hoofdletterongevoelig): de basis voor <code>SKIP_EXISTING</code>.</td></tr>
+<tr><td><code>collect_existing_sheets</code></td><td>Alle bestaande sheetnamen, plus via een tekstpatroon (regex) het hoogste bestaande "Opst&nbsp;&lt;n&gt;"-nummer — de nieuwe nummering loopt daar netjes op door.</td></tr>
+</table></div>
+
+<h3>2.4.7 Sheet- en parameterhulpen</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>set_titleblock_text_param</code></td><td>Schrijft (optioneel, CONFIG) het bouwnummer óók naar een tekstparameter op de titleblock-instance. CONFIG leeg → doet niets.</td></tr>
+<tr><td><code>_norm_param_name</code></td><td>Intern: normaliseert een parameternaam (spaties weg, kleine letters), zodat "IDG_sheettype" en "IDG_Sheettype&nbsp;" gelijk zijn.</td></tr>
+<tr><td><code>find_param_fuzzy</code></td><td>Zoekt een parameter eerst exact, anders spatie-/hoofdletterongevoelig. Geeft ook de wérkelijke naam terug voor het rapport.</td></tr>
+<tr><td><code>_set_param_value</code></td><td>Intern: zet een waarde met respect voor het opslagtype (tekst / geheel getal / kommagetal).</td></tr>
+<tr><td><code>_titleblock_on_sheet</code></td><td>Intern: pakt de titleblock-instance op een sheet.</td></tr>
+<tr><td><code>set_sheet_param</code></td><td>De "slimme schrijver": probeert een parameter te zetten op <strong>sheet → titleblock-instance → titleblock-type</strong>, in die volgorde, met fuzzy naam-matching. Geeft een resultaat terug (gelukt / waar / werkelijke naam / reden) voor het eindrapport.</td></tr>
+<tr><td><code>list_sheet_param_names</code></td><td>Diagnose: alle beschikbare parameternamen op sheet + titleblock. Alleen getoond als een parameter níet gezet kon worden — kopieer dan de juiste naam exact in <code>SHEET_PARAMS</code>.</td></tr>
+<tr><td><code>get_titleblock_outline_on_sheet</code></td><td>Buitenmaten van de titleblock op het sheet (met terugvalwaarde), als referentie voor viewport-plaatsing.</td></tr>
+<tr><td><code>place_viewport</code></td><td>Plaatst een viewport: <code>"left"</code> = verticaal gecentreerd links, <code>"topright"</code> = rechtsboven — met de CONFIG-marges, zodat de doorsnede vrij blijft van de stempel rechtsonder.</td></tr>
+</table></div>
+
+<h3>2.4.8 De keuzelijst (classes)</h3>
+<p>Een <strong>class</strong> is een sjabloon dat gegevens en gedrag bundelt. Deze twee bouwen voort op standaard-pyRevit-onderdelen:</p>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Class</th><th>Wat doet hij</th></tr>
+<tr><td><code>MechItem</code></td><td>Eén regel in de keuzelijst: koppelt een unit aan een rijk label ("bouwnummer&nbsp;|&nbsp;Familie&nbsp;:&nbsp;Type&nbsp;|&nbsp;verdieping") en of hij voorgevinkt is.</td></tr>
+<tr><td><code>MechSelect</code></td><td>Aangepaste <code>SelectFromList</code>. <strong>Waarom:</strong> pyRevit t/m 5.2 geeft bij "Volgende" alleen de vinkjes uit de <em>actieve</em> groep terug — met het Verdieping-filter op "01" verloor je dus stilletjes je vinkjes op andere verdiepingen. Deze override verzamelt de vinkjes uit <strong>alle</strong> groepen (ontdubbeld), op elke pyRevit-versie gelijk. Het filter is daardoor puur een filter. Bij onverwachte problemen valt hij terug op het standaardgedrag.</td></tr>
+</table></div>
+
+<h3>2.4.9 Aanmaak en hoofdroutine</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>create_for_unit</code></td><td>De werker: maakt voor <strong>één</strong> unit de gekozen outputs. Berekent de geometrie éénmalig en maakt dan — indien aangevinkt én nog niet bestaand — de doorsnede, de plattegrond (template, crop, verborgen croprand) en het sheet (nummer, naam, parameters, viewports). Elke stap heeft zijn eigen try/except; alles komt terug in één resultaat (aangemaakt / overgeslagen / fouten).</td></tr>
+<tr><td><code>main</code></td><td>De dirigent: voert de negen stappen uit &sect;2.1 uit en verzamelt alle resultaten voor het eindrapport. Bevat bewust nauwelijks detailwerk — zo lees je <code>main()</code> als een inhoudsopgave.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section>
+<h3>2.5 Vragen uit de tekenkamer — met antwoord</h3>
+
+<div class="oefening">
+<div class="kop">"Waarom staat mijn unit niet voorgevinkt?"</div>
+<div class="body"><p>Alleen units mét een ingevulde <code>IDG_Bouwnummer</code> (op instance óf type) staan voorgevinkt. Vul de parameter en draai opnieuw.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide het script twee keer — nu dubbele views?"</div>
+<div class="body"><p>Nee. <code>SKIP_EXISTING</code> staat aan: views en sheets die er al zijn (op naam) worden overgeslagen en verschijnen in het rapport onder "Overgeslagen". Het script is veilig om opnieuw te draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom kregen twee views een A en B achter de naam?"</div>
+<div class="body"><p>Twee units hadden hetzelfde bouwnummer. Viewnamen moeten uniek zijn, dus krijgen ze een suffix. De volgorde is vast (gesorteerd op ElementId): morgen hetzelfde als vandaag.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De sheetnummers lopen door na oude sheets — klopt dat?"</div>
+<div class="body"><p>Ja, bewust. Het script zoekt het hoogste bestaande "Opst&nbsp;&lt;n&gt;"-nummer en telt daarvandaan verder — zo ontstaan nooit dubbele sheetnummers.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Melding: view template niet gevonden."</div>
+<div class="body"><p>Dan bestaat <code>57_VL_Luchtinstallatie werktekeningen</code> niet (precies zo gespeld) in dit model. De plattegronden worden dan zónder template gemaakt; het script stopt daar niet op.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De crop van de plattegrond is niet gezet, zegt het rapport."</div>
+<div class="body"><p>Meestal: het view template zet "Crop&nbsp;View" uit, waardoor het script de crop niet mag aanpassen. Controleer het template — de melding in het rapport zegt dit ook.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik iets aanpassen zonder te programmeren?"</div>
+<div class="body"><p>Ja — alles in het <code>#&nbsp;CONFIG</code>-blok bovenin: templatenaam, titleblock, prefixen, marges (in mm), extra sheet-parameters. Verder niets aanraken.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"2 units gaven fouten, de rest lukte — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Dankzij de try/except-per-unit is de rest gewoon aangemaakt. Los het probleem bij die 2 units op (staat in het foutenrapport) en draai opnieuw: de gelukte units worden automatisch overgeslagen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat als ik halverwege annuleer, of er gaat iets ernstig mis?"</div>
+<div class="body"><p>Selectievensters annuleren = het script stopt zonder iets te wijzigen. Gaat er tijdens het aanmaken iets fundamenteel mis, dan draait de transactie álle wijzigingen terug — het model blijft zoals het was. En het hele resultaat is achteraf één Ctrl+Z.</p></div>
+</div>
+</section>
+</section>
+
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>CVAD &mdash; Copy Views As Dependent</h2></div><span class="flens"></span></div>
+<!-- ==================== 1 ==================== -->
+<section>
+<h3>3.1 Wat doet dit script?</h3>
+
+<p>Je kiest één of meer plattegrond-views en één of meer scope boxes. Het script maakt daarna van <strong>elke gekozen view</strong> voor <strong>elke gekozen scope box</strong> een <strong>dependent view</strong>: een "kind-view" die aan de originele view vasthangt, met die scope box direct toegepast als uitsnede en de croprand onzichtbaar gezet. De naam wordt automatisch "&lt;viewnaam&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box-naam&gt;".</p>
+
+<p>Het klassieke gebruik: je hebt per verdieping één plattegrond en per schacht één scope box. Selecteer 5 verdiepingsviews en 4 schacht-scope-boxes, en je hebt met één klik 5&nbsp;×&nbsp;4&nbsp;=&nbsp;20 schachtenplannen — netjes benoemd, correct uitgesneden, klaar om op sheets te zetten. Hetzelfde principe werkt voor views per kavel of per appartement.</p>
+
+<h3>3.1.1 De stappen</h3>
+<ol>
+<li><strong>Verzamelen</strong> — alle bruikbare views (Floor Plans, Ceiling Plans en Area Plans; geen templates) en alle scope boxes, allebei gesorteerd op naam voor een overzichtelijke lijst.</li>
+<li><strong>Views kiezen</strong> — eerste keuzelijst (meerdere mogelijk). Annuleren = netjes stoppen, zonder iets te wijzigen.</li>
+<li><strong>Scope boxes kiezen</strong> — tweede keuzelijst (meerdere mogelijk). Ook hier: annuleren = netjes stoppen.</li>
+<li><strong>Aanmaken</strong> — binnen één transactie wordt per combinatie (view&nbsp;×&nbsp;scope&nbsp;box) een dependent view gemaakt, benoemd, van scope box voorzien en de croprand verborgen. Combinaties waarvan de naam al bestaat worden <strong>overgeslagen</strong>; een fout bij één combinatie stopt de rest niet.</li>
+<li><strong>Rapporteren</strong> — overzicht in het output-paneel: aangemaakt (doorklikbaar), overgeslagen, fouten.</li>
+</ol>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Het script is <strong>idempotent</strong>: combinaties waarvan de viewnaam al bestaat worden overgeslagen (<code>SKIP_EXISTING</code>). Twee keer draaien levert dus nooit dubbele views of foutmeldingen over dubbele namen op.</p>
+</div>
+
+<div class="kader k-tip"><span class="lb">Dependent view ≠ gewone kopie</span>
+<p>Een <strong>dependent view</strong> is geen losse duplicaat maar een kind van de originele view: annotaties, view-instellingen en het template lopen mee met de ouder. Precies wat je wilt voor deelplannen — pas je de ouder aan, dan volgen alle schacht- of kavelviews vanzelf. In de Project Browser hangen ze ingesprongen ónder hun ouder.</p>
+</div>
+
+<div class="kader k-tip"><span class="lb">Wat is een scope box?</span>
+<p>Een scope box is een benoemd 3D-kader in het model (categorie "Volume of Interest"). Wijs je hem toe aan een view, dan wordt de crop van die view exact dat kader — op élke verdieping hetzelfde. Eén scope box "Schacht&nbsp;2" geeft dus op alle verdiepingen dezelfde uitsnede. Daarom is de combinatie scope&nbsp;box&nbsp;+&nbsp;dependent&nbsp;view zo sterk.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section>
+<h3>3.2 Begrippen in dít script</h3>
+
+<p>De algemene basis (variabelen, functies, try/except, lambda, Pylint, het verschil Python/IronPython/Dynamo) staat in hoofdstuk&nbsp;02 (Opstellingen). Hier alleen wat je nodig hebt om dít script te lezen.</p>
+
+<h3>3.2.1 Het CONFIG-blok — de instellingen van dit script</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Constante</th><th>Betekenis</th></tr>
+<tr><td><code>ALLOWED_VIEW_TYPES</code></td><td>Welke viewtypes in de keuzelijst komen: Floor&nbsp;Plan, Ceiling&nbsp;Plan, Area&nbsp;Plan.</td></tr>
+<tr><td><code>NAME_TEMPLATE</code></td><td>Het naamsjabloon, standaard <code>"{parent} - {box}"</code>. Wil je een andere naamgeving, dan pas je alléén deze regel aan.</td></tr>
+<tr><td><code>SKIP_EXISTING</code></td><td>Bestaande viewnamen overslaan (aan). Dit maakt het script veilig om opnieuw te draaien.</td></tr>
+<tr><td><code>HIDE_CROP_REGION</code></td><td>Croprand onzichtbaar zetten op de nieuwe views (aan).</td></tr>
+</table></div>
+
+<h3>3.2.2 De transactie — nu via de context manager</h3>
+<figure class="code"><figcaption>automatische rollback bij een fout<span>python</span></figcaption>
+<pre><code class="lang-py">with revit.Transaction("CVAD: dependent views met scope boxes"):
+    for parent_view in sel_views:
+        for scope_box in sel_boxes:
+            try:
+                # ... dependent view aanmaken ...
+                pass
+            except Exception as ex:
+                errors.append((parent_view.Name, scope_box.Name, str(ex)))</code></pre></figure>
+<p>Het <code>with</code>-blok start de transactie en sluit hem gegarandeerd weer af — óók als er iets misgaat, dan rolt Revit alle wijzigingen automatisch terug. Daarbinnen heeft elke combinatie zijn eigen <code>try</code>/<code>except</code>: één kapotte combinatie wordt genoteerd in de foutenlijst en de rest gaat gewoon door. Het hele resultaat is achteraf één Ctrl+Z.</p>
+
+<h3>3.2.3 Selectie op élement, niet op naam</h3>
+<p>De keuzelijsten geven nu rechtstreeks de gekozen <strong>Revit-elementen</strong> terug (via <code>name_attr='Name'</code> toont pyRevit gewoon de naam in de lijst). In v1.0 kreeg het script alleen namen terug en moest het daarna het bijbehorende element terugzoeken — wat mis kon gaan bij twee elementen met dezelfde naam. Dat terugzoeken bestaat niet meer.</p>
+
+<h3>3.2.4 De set met bestaande namen</h3>
+<figure class="code"><figcaption>bestaande namen, hoofdletterongevoelig<span>python</span></figcaption>
+<pre><code class="lang-py">names = set()
+for v in FilteredElementCollector(document).OfClass(View).ToElements():
+    names.add(v.Name.lower())</code></pre></figure>
+<p>Een <strong>set</strong> is een verzameling zonder dubbelen waarin opzoeken razendsnel is. Alle bestaande viewnamen gaan er in kleine letters in (Revit-namen zijn hoofdletterongevoelig); per combinatie checkt het script "bestaat deze naam al?" en elke nieuw aangemaakte naam wordt direct toegevoegd — zodat ook bínnen één run geen dubbele namen kunnen ontstaan.</p>
+
+<h3>3.2.5 Expliciete imports</h3>
+<p>v1.0 gebruikte <code>from Autodesk.Revit.DB import *</code> (alles in één keer). v1.1 benoemt precies wat het gebruikt: <code>FilteredElementCollector</code>, <code>BuiltInCategory</code>, <code>BuiltInParameter</code>, <code>View</code>, <code>ViewType</code>, <code>ViewDuplicateOption</code>. Zo zie je in één oogopslag waar het script op leunt, en de Dynamo-referentie (<code>RevitServices</code>) — die hier nooit thuishoorde — is verwijderd.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section>
+<h3>3.3 Functie-voor-functie referentie</h3>
+
+<h3>3.3.1 De vier functies</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_project_views(document)</code></td><td>Verzamelt alle views en filtert: <strong>geen</strong> view templates, alleen de viewtypes uit <code>ALLOWED_VIEW_TYPES</code>. Een view die zijn eigenschappen niet prijsgeeft (corrupt element) wordt stilletjes overgeslagen in plaats van het script te laten crashen.</td></tr>
+<tr><td><code>get_scope_boxes(document)</code></td><td>Verzamelt alle scope boxes: categorie <code>OST_VolumeOfInterest</code> ("Volume of Interest" is de interne Revit-naam voor scope boxes).</td></tr>
+<tr><td><code>collect_existing_view_names(document)</code></td><td>Bouwt de set met alle bestaande viewnamen in kleine letters — de basis voor <code>SKIP_EXISTING</code> (zie&nbsp;2.4).</td></tr>
+<tr><td><code>create_dependent_view(document, parent_view, scope_box, new_name)</code></td><td>Het werkpaard, vier stappen: (1)&nbsp;<code>Duplicate(ViewDuplicateOption.AsDependent)</code> maakt de dependent duplicate — dat geeft een Id terug, dus (2) haalt <code>doc.GetElement(...)</code> het echte view-element op; (3) de meegegeven naam wordt gezet; (4) via twee ingebouwde parameters wordt de scope box toegewezen (<code>VIEWER_VOLUME_OF_INTEREST_CROP</code>) en de croprand verborgen (<code>VIEWER_CROP_REGION_VISIBLE</code>&nbsp;=&nbsp;0 — een ja/nee als getal). Beide parameters worden eerst gecontroleerd op bestaan én schrijfbaarheid.</td></tr>
+</table></div>
+
+<h3>3.3.2 De hoofdroutine main()</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Stap</th><th>Wat gebeurt er</th></tr>
+<tr><td><strong>1. Verzamelen + controleren</strong></td><td>Views en scope boxes ophalen; is één van beide leeg, dan stopt het script met een duidelijke melding. Beide lijsten worden op naam gesorteerd (met een lambda als sorteersleutel — zie &sect;2.2.5).</td></tr>
+<tr><td><strong>2-3. Twee keuzelijsten</strong></td><td><code>forms.SelectFromList.show(..., name_attr='Name', multiselect=True)</code>: eerst views, dan scope boxes. Na élke lijst een cancel-check: <code>if not sel_...: script.exit()</code> — annuleren stopt het script netjes, zonder foutmelding en zonder wijziging.</td></tr>
+<tr><td><strong>4. Aanmaken</strong></td><td>De dubbele lus (het <strong>kruisproduct</strong>: elke view × elke scope box) binnen de context-managertransactie, met per combinatie: naam bouwen via <code>NAME_TEMPLATE</code> → bestaat al? overslaan → anders aanmaken → naam aan de set toevoegen. Fouten per combinatie worden verzameld, niet fataal.</td></tr>
+<tr><td><strong>5. Rapporteren</strong></td><td><code>output.print_md</code>: aantallen aangemaakt / overgeslagen / fouten, gevolgd door de drie lijsten. Aangemaakte views zijn <strong>doorklikbaar</strong> via <code>output.linkify</code> — klik en Revit springt naar de view.</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo controleer je het resultaat</span>
+<p>Open het rapport in het output-paneel en klik een aangemaakte view aan — of open de Project Browser: onder elke geselecteerde ouder-view hangen ingesprongen kind-views met de naam "&lt;ouder&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box&gt;". De uitsnede volgt exact de scope box, zonder zichtbare croprand.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section>
+<h3>3.4 Vragen uit de tekenkamer — met antwoord</h3>
+
+<div class="oefening">
+<div class="kop">"Hoeveel views krijg ik precies?"</div>
+<div class="body"><p>Aantal gekozen views × aantal gekozen scope boxes. Élke view krijgt élke scope box. Wil je per verdieping verschillende schachten, draai het script dan per groep apart — dankzij het overslaan van bestaande namen kan dat veilig in meerdere rondes.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat gebeurt er als ik op Annuleren klik?"</div>
+<div class="body"><p>Het script stopt netjes, zonder foutmelding en zonder iets in het model te wijzigen. Dat geldt voor beide keuzelijsten.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide het script twee keer — nu dubbele views?"</div>
+<div class="body"><p>Nee. Combinaties waarvan de viewnaam al bestaat worden overgeslagen en verschijnen in het rapport onder "Overgeslagen". Het script is veilig om opnieuw te draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom staat mijn doorsnede/3D-view niet in de lijst?"</div>
+<div class="body"><p>Bewust: het script toont alleen Floor Plans, Ceiling Plans en Area Plans (en geen view templates) — zie <code>ALLOWED_VIEW_TYPES</code> in het CONFIG-blok. Dependent views met scope boxes zijn een plattegrond-werkwijze.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik de naamgeving aanpassen?"</div>
+<div class="body"><p>Ja, zonder te programmeren: pas <code>NAME_TEMPLATE</code> aan in het CONFIG-blok, bijvoorbeeld <code>"{box} ({parent})"</code>. De bouwstenen <code>{parent}</code> en <code>{box}</code> worden vervangen door de viewnaam en de scope box-naam.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Twee scope boxes heten hetzelfde — wat gebeurt er?"</div>
+<div class="body"><p>De namen van de nieuwe views worden dan identiek, dus de tweede combinatie wordt overgeslagen als "bestaat al". Geef je scope boxes unieke, betekenisvolle namen (bijv. "Schacht&nbsp;1", "Schacht&nbsp;2") vóór je het script draait — die namen komen ook in de viewnamen terug.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De uitsnede klopt, maar ik zie geen croprand — hoort dat?"</div>
+<div class="body"><p>Ja: <code>HIDE_CROP_REGION</code> staat aan voor een schoon beeld. De crop ís er wel (de scope box bepaalt hem); alleen de rand is verborgen. Aanzetten kan per view in de properties, of structureel via het CONFIG-blok.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Volgen de dependent views het view template van de ouder?"</div>
+<div class="body"><p>Ja — dat is precies de kracht van dependent views: template, zichtbaarheidsinstellingen en annotaties van de ouder gelden ook voor de kinderen. Pas de ouder aan en alle schacht-/kavelviews volgen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Eén combinatie gaf een fout — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Elke combinatie heeft zijn eigen foutafhandeling: de rest is gewoon aangemaakt en de fout staat met view- en scope box-naam in het rapport. Los de oorzaak op en draai opnieuw — de gelukte combinaties worden dan overgeslagen.</p></div>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section>
+<h3>3.5 Wat is er nieuw in v1.1</h3>
+
+<p>v1.1 brengt het script naar de huisstijl van de nieuwere toolbar-scripts (zoals Opstellingen). De werking voor jou als gebruiker is hetzelfde gebleven — er zijn vangnetten en gemak bijgekomen:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0 (2024)</th><th>v1.1 (2026)</th></tr>
+<tr><td>Annuleren gaf een rode foutmelding</td><td>Cancel-check na elke keuzelijst: annuleren stopt netjes, zonder wijziging</td></tr>
+<tr><td>Eén fout (bijv. dubbele naam) stopte de hele batch</td><td>Try/except per combinatie: fouten worden verzameld en gerapporteerd, de rest gaat door</td></tr>
+<tr><td>Tweede run crashte op bestaande namen</td><td><code>SKIP_EXISTING</code>: bestaande namen worden overgeslagen — veilig om opnieuw te draaien</td></tr>
+<tr><td>Handmatige transactie (<code>Start()</code>/<code>Commit()</code>), geen rollback bij een fout</td><td>Context manager <code>with revit.Transaction(...)</code>: automatische rollback</td></tr>
+<tr><td>Keuzelijsten op naam + terugzoeken met <code>next()</code></td><td>Selectie geeft de elementen zelf terug — geen naam-terugzoeken, geen verwisseling bij dubbele namen</td></tr>
+<tr><td>Pop-up "successfully created"</td><td>Rapport in het output-paneel: aangemaakt (doorklikbaar via <code>linkify</code>), overgeslagen, fouten</td></tr>
+<tr><td><code>import *</code> + Dynamo-referentie (<code>RevitServices</code>)</td><td>Expliciete imports, Dynamo-referentie verwijderd</td></tr>
+<tr><td>Vaste naamgeving en gedrag in de code</td><td>CONFIG-blok: naamsjabloon, viewtypes, overslaan en croprand instelbaar zonder programmeren</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl. v1.1 voldoet op alle drie.</p>
+</div>
+</section>
+</section>
+
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>3D Views met Scope Boxes</h2></div><span class="flens"></span></div>
+<!-- ==================== 1 ==================== -->
+<section>
+<h3>4.1 Wat doet dit script?</h3>
+
+<p>Je kiest één of meer 3D-views en één of meer scope boxes. Het script maakt daarna van <strong>elke gekozen 3D-view</strong> voor <strong>elke gekozen scope box</strong> een <strong>volledige kopie</strong>, met die scope box direct toegepast — de 3D-uitsnede (section box) volgt dan het kader van de scope box — en de croprand onzichtbaar. De naam wordt automatisch "&lt;viewnaam&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box-naam&gt;".</p>
+
+<p>Het klassieke gebruik: je hebt één goed ingestelde 3D-werkview en per schacht één scope box. Selecteer die ene view en 6 schacht-scope-boxes, en je hebt met één klik 6 uitgesneden 3D-views — één per schacht, netjes benoemd. Hetzelfde principe werkt voor 3D-views per kavel of per appartement.</p>
+
+<h3>4.1.1 De stappen</h3>
+<ol>
+<li><strong>Verzamelen</strong> — alle 3D-views (geen view templates) en alle scope boxes, allebei gesorteerd op naam.</li>
+<li><strong>3D-views kiezen</strong> — eerste keuzelijst (meerdere mogelijk). Annuleren = netjes stoppen, zonder iets te wijzigen.</li>
+<li><strong>Scope boxes kiezen</strong> — tweede keuzelijst (meerdere mogelijk). Ook hier: annuleren = netjes stoppen.</li>
+<li><strong>Aanmaken</strong> — binnen één transactie wordt per combinatie (view&nbsp;×&nbsp;scope&nbsp;box) een kopie gemaakt, benoemd, van scope box voorzien en de croprand verborgen. Bestaande namen worden <strong>overgeslagen</strong>; een fout bij één combinatie stopt de rest niet.</li>
+<li><strong>Rapporteren</strong> — overzicht in het output-paneel: aangemaakt (doorklikbaar), overgeslagen, fouten.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Scope box op een 3D-view = uitsnede als blok</span>
+<p>Wijs je een scope box toe aan een 3D-view, dan snijdt Revit de view uit op precies dat kader: de <strong>section box</strong> volgt de scope box. Zo kijk je als het ware in een "uitgezaagd blok" van het model — ideaal om per schacht of appartement alleen dát stuk installatie te zien.</p>
+</div>
+
+<div class="kader k-tip"><span class="lb">Volledige kopie, geen dependent view</span>
+<p>Anders dan bij het zusterscript <strong>CVAD</strong> (plattegronden) maakt dit script <strong>volledige kopieën</strong>. Elke 3D-view staat dus op zichzelf: eigen instellingen, eigen uitsnede. Handig om te weten: pas je achteraf de originele view aan, dan veranderen de kopieën <em>niet</em> mee — behalve via een gedeeld view template, want dat werkt op alle views waaraan het is toegewezen.</p>
+</div>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Het script is <strong>idempotent</strong>: combinaties waarvan de viewnaam al bestaat worden overgeslagen (<code>SKIP_EXISTING</code>). Twee keer draaien levert dus nooit dubbele views of foutmeldingen over dubbele namen op.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section>
+<h3>4.2 Begrippen in dít script</h3>
+
+<p>De algemene basis (variabelen, functies, try/except, lambda, Pylint, het verschil Python/IronPython/Dynamo) staat in hoofdstuk&nbsp;02 (Opstellingen). De v1.1-mechanieken die dit script deelt met CVAD — de context-managertransactie met try/except per combinatie, de selectie op élement in plaats van naam, en de set met bestaande namen — staan volledig uitgelegd in &sect;3.2 (CVAD). Hier alleen wat eigen is aan dít script.</p>
+
+<h3>4.2.1 Het CONFIG-blok — de instellingen van dit script</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Constante</th><th>Betekenis</th></tr>
+<tr><td><code>NAME_TEMPLATE</code></td><td>Het naamsjabloon, standaard <code>"{parent} - {box}"</code>. Andere naamgeving? Pas alléén deze regel aan, bijv. <code>"3D {box}"</code>.</td></tr>
+<tr><td><code>SKIP_EXISTING</code></td><td>Bestaande viewnamen overslaan (aan). Maakt het script veilig om opnieuw te draaien.</td></tr>
+<tr><td><code>HIDE_CROP_REGION</code></td><td>Croprand onzichtbaar zetten op de nieuwe views (aan).</td></tr>
+</table></div>
+
+<h3>4.2.2 Duplicate versus AsDependent</h3>
+<figure class="code"><figcaption>het ene woord dat dit script anders maakt dan CVAD<span>python</span></figcaption>
+<pre><code class="lang-py"># CVAD (plattegronden): kind-view die aan de ouder vasthangt
+dep_id = parent_view.Duplicate(ViewDuplicateOption.AsDependent)
+
+# Dit script (3D): volledige, zelfstandige kopie
+dup_id = parent_view.Duplicate(ViewDuplicateOption.Duplicate)</code></pre></figure>
+<p><code>Duplicate(...)</code> is dezelfde Revit-functie; de <strong>optie</strong> bepaalt het resultaat. <code>AsDependent</code> maakt een kind dat instellingen van de ouder volgt; <code>Duplicate</code> maakt een losse kopie die daarna zijn eigen leven leidt. Voor 3D-deelviews per schacht wil je dat laatste: elke view zijn eigen uitsnede, onafhankelijk van de werkview waaruit hij gekopieerd is.</p>
+
+<h3>4.2.3 De twee ingebouwde parameters</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:44%">Parameter</th><th>Wat er gezet wordt</th></tr>
+<tr><td><code>VIEWER_VOLUME_OF_INTEREST_CROP</code></td><td>De scope box-toewijzing van de view — hiermee gaat de 3D-uitsnede het scope box-kader volgen.</td></tr>
+<tr><td><code>VIEWER_CROP_REGION_VISIBLE</code></td><td>"Crop Region Visible", gezet op <code>0</code> (uit). Het is een ja/nee die als getal wordt opgeslagen: 1&nbsp;=&nbsp;aan, 0&nbsp;=&nbsp;uit.</td></tr>
+</table></div>
+<p>Beide worden eerst gecontroleerd op bestaan én schrijfbaarheid (<code>IsReadOnly</code>) voordat er geschreven wordt — een view waarbij dat niet kan levert dan hooguit een regel in het foutenrapport op, geen crash.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section>
+<h3>4.3 Functie-voor-functie referentie</h3>
+
+<h3>4.3.1 De vier functies</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_project_3d_views(document)</code></td><td>Verzamelt alle 3D-views (klasse <code>View3D</code>) en filtert view templates eruit. Een view die zijn eigenschappen niet prijsgeeft (corrupt element) wordt stilletjes overgeslagen in plaats van het script te laten crashen.</td></tr>
+<tr><td><code>get_scope_boxes(document)</code></td><td>Verzamelt alle scope boxes: categorie <code>OST_VolumeOfInterest</code> ("Volume of Interest" is de interne Revit-naam voor scope boxes).</td></tr>
+<tr><td><code>collect_existing_view_names(document)</code></td><td>Bouwt de set met alle bestaande viewnamen in kleine letters (Revit-namen zijn hoofdletterongevoelig) — de basis voor <code>SKIP_EXISTING</code>. Kijkt bewust naar <em>alle</em> views, niet alleen 3D: viewnamen moeten uniek zijn in het hele project.</td></tr>
+<tr><td><code>create_duplicated_view(document, parent_view, scope_box, new_name)</code></td><td>Het werkpaard, vier stappen: (1)&nbsp;<code>Duplicate(ViewDuplicateOption.Duplicate)</code> maakt de volledige kopie — dat geeft een Id terug, dus (2) haalt <code>doc.GetElement(...)</code> het echte view-element op; (3) de meegegeven naam wordt gezet; (4) de scope box wordt toegewezen en de croprand verborgen via de twee parameters uit&nbsp;2.3, elk met bestaan- en schrijfbaarheidscontrole.</td></tr>
+</table></div>
+
+<h3>4.3.2 De hoofdroutine main()</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Stap</th><th>Wat gebeurt er</th></tr>
+<tr><td><strong>1. Verzamelen + controleren</strong></td><td>3D-views en scope boxes ophalen; is één van beide leeg, dan stopt het script met een duidelijke melding. Beide lijsten worden op naam gesorteerd (lambda als sorteersleutel — zie &sect;2.2.5).</td></tr>
+<tr><td><strong>2-3. Twee keuzelijsten</strong></td><td><code>forms.SelectFromList.show(..., name_attr='Name', multiselect=True)</code>: eerst 3D-views, dan scope boxes — de gekozen <em>elementen</em> komen direct terug. Na élke lijst een cancel-check: <code>if not sel_...: script.exit()</code> — annuleren stopt netjes, zonder foutmelding en zonder wijziging.</td></tr>
+<tr><td><strong>4. Aanmaken</strong></td><td>De dubbele lus (het <strong>kruisproduct</strong>: elke view × elke scope box) binnen <code>with revit.Transaction("3D views dupliceren met scope boxes"):</code>, met per combinatie: naam bouwen via <code>NAME_TEMPLATE</code> → bestaat al? overslaan → anders aanmaken → naam aan de set toevoegen. Fouten per combinatie worden verzameld, niet fataal.</td></tr>
+<tr><td><strong>5. Rapporteren</strong></td><td><code>output.print_md</code>: aantallen aangemaakt / overgeslagen / fouten, gevolgd door de drie lijsten. Aangemaakte views zijn <strong>doorklikbaar</strong> via <code>output.linkify</code>.</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo controleer je het resultaat</span>
+<p>Open het rapport in het output-paneel en klik een aangemaakte view aan. De 3D-view toont alleen het "blok" binnen de scope box, zonder zichtbare croprand, en heet "&lt;ouder&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box&gt;".</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section>
+<h3>4.4 Vragen uit de tekenkamer — met antwoord</h3>
+
+<div class="oefening">
+<div class="kop">"Hoeveel views krijg ik precies?"</div>
+<div class="body"><p>Aantal gekozen 3D-views × aantal gekozen scope boxes. Meestal kies je hier één goed ingestelde werkview en meerdere scope boxes: 1&nbsp;×&nbsp;6&nbsp;=&nbsp;6 nieuwe views.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Als ik de originele 3D-view later aanpas, veranderen de kopieën dan mee?"</div>
+<div class="body"><p>Nee — dit zijn volledige kopieën, geen dependent views. Handmatige instellingen op de ouder werken niet door. Uitzondering: een gedeeld <strong>view template</strong> — pas je dát aan, dan volgen alle views waaraan het is toegewezen, dus ook de kopieën.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat gebeurt er als ik op Annuleren klik?"</div>
+<div class="body"><p>Het script stopt netjes, zonder foutmelding en zonder iets in het model te wijzigen. Dat geldt voor beide keuzelijsten.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide het script twee keer — nu dubbele views?"</div>
+<div class="body"><p>Nee. Combinaties waarvan de viewnaam al bestaat worden overgeslagen en verschijnen in het rapport onder "Overgeslagen". Het script is veilig om opnieuw te draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik de naamgeving aanpassen?"</div>
+<div class="body"><p>Ja, zonder te programmeren: pas <code>NAME_TEMPLATE</code> aan in het CONFIG-blok, bijvoorbeeld <code>"3D {box}"</code> of <code>"{box} ({parent})"</code>. De bouwstenen <code>{parent}</code> en <code>{box}</code> worden vervangen door de viewnaam en de scope box-naam.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Twee scope boxes heten hetzelfde — wat gebeurt er?"</div>
+<div class="body"><p>De namen van de nieuwe views worden dan identiek, dus de tweede combinatie wordt overgeslagen als "bestaat al". Geef je scope boxes unieke, betekenisvolle namen (bijv. "Schacht&nbsp;1", "Schacht&nbsp;2") vóór je het script draait — die namen komen ook in de viewnamen terug.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik zie de section box-randen in beeld — kan die uit?"</div>
+<div class="body"><p>De <em>croprand</em> zet het script al uit. De <em>section box</em> zelf (het 3D-kader) kun je per view verbergen via <strong>Visibility/Graphics&nbsp;→ Annotation Categories&nbsp;→ Section Boxes</strong>, of structureel via het view template.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Eén combinatie gaf een fout — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Elke combinatie heeft zijn eigen foutafhandeling: de rest is gewoon aangemaakt en de fout staat met view- en scope box-naam in het rapport. Los de oorzaak op en draai opnieuw — de gelukte combinaties worden dan overgeslagen.</p></div>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section>
+<h3>4.5 Wat is er nieuw in v1.1</h3>
+
+<p>v1.1 brengt het script naar de huisstijl van de nieuwere toolbar-scripts, exact zoals bij CVAD. De werking voor jou als gebruiker is hetzelfde gebleven — er zijn vangnetten en gemak bijgekomen:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0 (2024)</th><th>v1.1 (2026)</th></tr>
+<tr><td>Annuleren gaf een rode foutmelding</td><td>Cancel-check na elke keuzelijst: annuleren stopt netjes, zonder wijziging</td></tr>
+<tr><td>Eén fout (bijv. dubbele naam) stopte de hele batch</td><td>Try/except per combinatie: fouten worden verzameld en gerapporteerd, de rest gaat door</td></tr>
+<tr><td>Tweede run crashte op bestaande namen</td><td><code>SKIP_EXISTING</code>: bestaande namen worden overgeslagen — veilig om opnieuw te draaien</td></tr>
+<tr><td>Handmatige transactie (<code>Start()</code>/<code>Commit()</code>), geen rollback bij een fout</td><td>Context manager <code>with revit.Transaction(...)</code>: automatische rollback</td></tr>
+<tr><td>Keuzelijsten op naam + terugzoeken met <code>next()</code></td><td>Selectie geeft de elementen zelf terug — geen naam-terugzoeken, geen verwisseling bij dubbele namen</td></tr>
+<tr><td>Pop-up ter afsluiting</td><td>Rapport in het output-paneel: aangemaakt (doorklikbaar via <code>linkify</code>), overgeslagen, fouten</td></tr>
+<tr><td><code>import *</code> + Dynamo-referentie (<code>RevitServices</code>)</td><td>Expliciete imports, Dynamo-referentie verwijderd</td></tr>
+<tr><td>Vaste naamgeving en gedrag in de code</td><td>CONFIG-blok: naamsjabloon, overslaan en croprand instelbaar zonder programmeren</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl. v1.1 voldoet op alle drie.</p>
+</div>
+</section>
+</section>
+
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>De vier Tag-knoppen</h2></div><span class="flens"></span></div>
+<!-- ==================== 1 ==================== -->
+<section>
+<h3>5.1 De vier knoppen in één oogopslag</h3>
+
+<p>Alle vier de knoppen doen hetzelfde soort werk: views selecteren, de juiste elementen vinden, en per element automatisch een tag plaatsen met de juiste IDG-tagfamilie. Wat er getagd wordt en waarmee, verschilt per knop:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th>Knop</th><th>Wat wordt getagd</th><th>Tagfamilie</th><th>In welke views</th></tr>
+<tr><td><strong>Tag Ducts</strong></td><td>Kanalen &gt; 1200&nbsp;mm, niet verticaal</td><td><code>57_IDG_afmeting ro</code> (rond) / <code>57_IDG_afmeting rh</code> (rechthoekig), type&nbsp;1.8&nbsp;mm</td><td>Plattegronden</td></tr>
+<tr><td><strong>Tag Air Terminals</strong></td><td>Alle Air Terminals; dakkappen krijgen een eigen tag</td><td><code>57_IDG_rooster_flow</code> (1.8&nbsp;mm) / <code>57_IDG_Dakkap TAG</code> (RAL kleur)</td><td>Plattegronden + plafondplattegronden</td></tr>
+<tr><td><strong>Tag Duct Fittings</strong></td><td>Fittings uit de instort-reeks (<code>NLRS_57_DUF_UN_*</code>)</td><td><code>57_IDG_O-B_instort</code></td><td>Plattegronden</td></tr>
+<tr><td><strong>Tag Rooms</strong></td><td>Alle rooms — óók uit gelinkte modellen</td><td>Standaard roomtag van het project</td><td>Plattegronden + doorsnedes</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Alle vier de knoppen controleren of een element <strong>al een tag heeft</strong> in de betreffende view en slaan het dan over. Twee keer draaien levert dus geen dubbele tags op; het rapport toont hoeveel er is overgeslagen.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section>
+<h3>5.2 Gemeenschappelijke werking</h3>
+
+<p>De algemene basis (variabelen, CONFIG, try/except, lambda) staat in hoofdstuk&nbsp;02 (Opstellingen); de v1.1-mechanieken (context-managertransactie, cancel-checks) in &sect;3.2 (CVAD). Elke tag-knop volgt hetzelfde stramien:</p>
+
+<h3>5.2.1 De stappen</h3>
+<ol>
+<li><strong>Views kiezen</strong> — keuzelijst met de geschikte viewtypes, gesorteerd op naam. Staat je <strong>actieve view</strong> ertussen, dan staat die bovenaan als "[Huidige view] …". Annuleren = netjes stoppen, zonder wijziging.</li>
+<li><strong>Tagfamilie opzoeken</strong> — het script zoekt de tagfamilie(s) uit het CONFIG-blok, met voorkeur voor het juiste type (bijv. "1.8&nbsp;mm"); bestaat dat type niet, dan het eerste beschikbare type van die familie. Ontbreekt de familie helemaal, dan stopt het script met een duidelijke melding.</li>
+<li><strong>Elementen verzamelen en filteren</strong> — per view worden de elementen van de juiste categorie opgehaald en gefilterd op de knop-specifieke criteria (hoofdstukken 03–06).</li>
+<li><strong>Duplicaatcontrole</strong> — per view wordt eerst één set opgebouwd van element-Id's die al een tag hebben; elementen in die set worden overgeslagen.</li>
+<li><strong>Taggen</strong> — binnen één transactie, met per element een eigen try/except: één kapot element stopt de batch niet.</li>
+<li><strong>Rapporteren</strong> — aantallen (aangemaakt, overgeslagen, uitgesloten, fouten) in het output-paneel; fouten met doorklikbare element-links.</li>
+</ol>
+
+<h3>5.2.2 Hoe komt een tag op zijn plek?</h3>
+<p>De knoppen voor kanalen, roosters en fittings gebruiken <code>IndependentTag.Create(...)</code>: één Revit-API-aanroep die de tag maakt, aan het element koppelt en een <strong>leader</strong> (aanwijslijntje) geeft. De tagpositie is de elementlocatie plus een vaste offset in millimeters uit het CONFIG-blok — loodrecht op het kanaal (400&nbsp;mm), rechts van het rooster (300&nbsp;mm) of boven de fitting (100&nbsp;mm). Tag Rooms gebruikt de room-specifieke aanroep <code>NewRoomTag(...)</code> (&sect;5.6).</p>
+
+<div class="kader k-tip"><span class="lb">Alles is achteraf verplaatsbaar</span>
+<p>De offsets zijn een nette startpositie, geen eindstand. Elke tag is een gewoon Revit-element dat je daarna vrij kunt verslepen; de leader blijft aan het element vastzitten.</p>
+</div>
+
+<h3>5.2.3 De duplicaatcontrole, iets preciezer</h3>
+<p>Per view verzamelt het script alle bestaande tags van de juiste categorie en leest per tag af naar welk element hij wijst — via de nieuwere API-methode (<code>GetTaggedElementIds</code>, Revit&nbsp;2022+) met een terugval voor oudere versies. Kan een enkele tag niet gelezen worden, dan wordt die genegeerd: liever heel af en toe één dubbele tag dan een crash halverwege.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section>
+<h3>5.3 Tag Ducts</h3>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>MIN_LENGTH_MM</code></td><td>1200 — kortere kanalen krijgen geen tag (te druk beeld).</td></tr>
+<tr><td><code>VERTICAL_ANGLE_DEG</code></td><td>30 — kanalen binnen 30° van verticaal zijn standleidingen en worden uitgesloten.</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>400 — de tag staat 400&nbsp;mm loodrecht náást het kanaal, ter hoogte van het midden.</td></tr>
+<tr><td>Tagfamilies</td><td><code>57_IDG_afmeting ro</code> (rond) en <code>57_IDG_afmeting rh</code> (rechthoekig), voorkeurstype "1.8".</td></tr>
+</table></div>
+
+<p><strong>Rond of rechthoekig?</strong> Het script kijkt naar de parameter <code>Diameter</code>: heeft het kanaal een diameter groter dan nul, dan is het rond en krijgt het de ro-tag; anders de rh-tag. <strong>Verticaal of niet?</strong> Van de middellijn van het kanaal wordt de hoek met de verticale as berekend (een stukje meetkunde met <code>math.acos</code>); binnen 30° telt als standleiding.</p>
+
+<div class="kader k-tip"><span class="lb">Waarom standleidingen uitsluiten?</span>
+<p>Een verticaal kanaal is in een plattegrond maar een klein rondje — een afmetingstag met leader erbij vervuilt de tekening en de maat zegt daar weinig. Standleidingen krijgen hun informatie via de doorsnedes.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section>
+<h3>5.4 Tag Air Terminals</h3>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td>Standaardtag</td><td><code>57_IDG_rooster_flow</code>, voorkeurstype "1.8&nbsp;mm".</td></tr>
+<tr><td>Dakkap-detectie</td><td>Familienaam bevat <code>57_RBV_Project dakkap met aanzuig</code> → tagfamilie <code>57_IDG_Dakkap TAG</code>, voorkeurstype "RAL kleur".</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>300 — de tag staat 300&nbsp;mm rechts van het element.</td></tr>
+<tr><td>Views</td><td>Plattegronden én plafondplattegronden (roosters zitten vaak in het plafond).</td></tr>
+</table></div>
+
+<p>Per element bepaalt het script eerst of het een <strong>dakkap</strong> is (op familienaam) en kiest dan de bijbehorende tag. Is de dakkap-tagfamilie niet geladen, dan stopt het script niet: dakkappen krijgen dan de standaardtag en het rapport meldt dit onderaan als "Let op".</p>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section>
+<h3>5.5 Tag Duct Fittings</h3>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>TARGET_FAMILY_PREFIXES</code></td><td><code>NLRS_57_DUF_UN_eindstuk</code>, <code>…_instort traphoek</code>, <code>…_instortpot</code>, <code>…_tussenstuk</code> — alléén deze instort-families worden getagd.</td></tr>
+<tr><td>Tagfamilie</td><td><code>57_IDG_O-B_instort</code> (gezocht op naam, hoofdletterongevoelig).</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>100 — de tag staat 100&nbsp;mm boven het element.</td></tr>
+</table></div>
+
+<p>Het rapport toont per run hoeveel fittings er in totaal gevonden zijn en hoeveel daarvan <strong>passend</strong> waren (familienaam bevat één van de prefixen). Zo zie je meteen of een lage telling komt door de view-inhoud of door de filterlijst. Nieuwe instort-familie in gebruik? Voeg de prefix toe aan <code>TARGET_FAMILY_PREFIXES</code> in het CONFIG-blok — één regel, geen programmeerwerk.</p>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section>
+<h3>5.6 Tag Rooms</h3>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>INCLUDE_LINKS</code></td><td>Aan — ook rooms uit gelinkte modellen worden getagd. Handig omdat de rooms bij ons meestal in het bouwkundige (gelinkte) model zitten.</td></tr>
+<tr><td>Views</td><td>Plattegronden én doorsnedes. In een doorsnede wordt de tag naar <strong>halve ruimtehoogte</strong> verplaatst, zodat hij midden in de ruimte hangt.</td></tr>
+</table></div>
+
+<p>Dit script wijkt op twee punten af van de andere drie. Ten eerste gebruikt het niet <code>IndependentTag.Create</code> maar de room-specifieke aanroep <code>NewRoomTag(...)</code>, die een <code>LinkElementId</code> verwacht: voor een eigen room alleen het room-Id, voor een gelinkte room het link-Id én het room-Id samen — zo weet Revit in wélk model de room woont. Ten tweede berekent het zelf het middelpunt: het locatiepunt van de room, op halve hoogte tussen onder- en bovengrens (heeft een room geen bovengrens, dan gewoon het locatiepunt).</p>
+
+<div class="kader k-tip"><span class="lb">Room niet getagd?</span>
+<p>Rooms zonder locatiepunt (niet-geplaatste of "redundant" rooms) kunnen geen tag krijgen en verschijnen in het rapport onder "Geen middelpunt bepaald". Dat is een signaal om die rooms in het (gelinkte) model op te ruimen.</p>
+</div>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section>
+<h3>5.7 Vragen uit de tekenkamer — met antwoord</h3>
+
+<div class="oefening">
+<div class="kop">"Ik draaide een tag-knop twee keer — nu dubbele tags?"</div>
+<div class="body"><p>Nee. Elk script controleert per view welke elementen al een tag hebben en slaat die over; het rapport telt ze onder "Al getagd, overgeslagen". Handmatig geplaatste tags tellen daarbij gewoon mee.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom krijgt dit korte kanaal geen tag?"</div>
+<div class="body"><p>Tag Ducts tagt alleen kanalen langer dan 1200&nbsp;mm; kortere stukken en standleidingen (binnen 30° van verticaal) worden bewust overgeslagen — het rapport telt de uitgesloten verticale kanalen. Andere grens nodig? Pas <code>MIN_LENGTH_MM</code> aan in het CONFIG-blok.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Melding: tagfamilie niet gevonden."</div>
+<div class="body"><p>De tagfamilie uit het CONFIG-blok is niet in dit project geladen (of heet nét anders). Laad de familie via Insert&nbsp;→ Load&nbsp;Family en draai opnieuw. Alleen bij de dakkap-tag gaat het script zónder verder (dakkappen krijgen dan de standaardtag).</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De tags staan niet allemaal even mooi — kan dat beter?"</div>
+<div class="body"><p>De scripts plaatsen tags op een vaste, voorspelbare offset; bij drukke tekeningen kunnen tags elkaar raken. Versleep ze gewoon — de leader blijft aan het element hangen. De offset structureel anders? Eén regel in het CONFIG-blok (<code>TAG_OFFSET_MM</code>).</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Een fitting uit een nieuwe familie wordt niet getagd."</div>
+<div class="body"><p>Tag Duct Fittings tagt alleen families waarvan de naam één van de prefixen uit <code>TARGET_FAMILY_PREFIXES</code> bevat. Nieuwe familie? Prefix toevoegen in het CONFIG-blok en opnieuw draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Tag Rooms tagt niets, terwijl er wel ruimtes zijn."</div>
+<div class="body"><p>Waarschijnlijk zitten de rooms in een gelinkt model dat niet geladen is (link "Unloaded"), of zijn de rooms niet geplaatst. Controleer de link in Manage&nbsp;Links en het rapport onder "Geen middelpunt bepaald".</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Eén element gaf een fout — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Elk element heeft zijn eigen foutafhandeling: de rest is gewoon getagd en de fout staat met doorklikbare element-link in het rapport. Oorzaak oplossen, opnieuw draaien — al getagde elementen worden overgeslagen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat gebeurt er als ik op Annuleren klik?"</div>
+<div class="body"><p>Het script stopt netjes, zonder foutmelding en zonder iets in het model te wijzigen.</p></div>
+</div>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section>
+<h3>5.8 Wat is er nieuw in v1.1</h3>
+
+<p>Alle vier de scripts zijn naar de huisstijl van de nieuwere toolbar-scripts gebracht. De tagfamilies, filters en offsets zijn <strong>ongewijzigd</strong> — het gedrag dat je kent blijft hetzelfde. Wat er onder de motorkap veranderde:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0 (2024/2025)</th><th>v1.1 (2026)</th></tr>
+<tr><td>Losse waarden (1200, 400, familienamen) verspreid door de code</td><td>Alles in één CONFIG-blok per script — aanpasbaar zonder programmeren</td></tr>
+<tr><td><code>import *</code> en drievoudige tag-aanmaak-pogingen voor oeroude Revit-versies</td><td>Expliciete imports en één moderne <code>IndependentTag.Create</code>-aanroep (Revit&nbsp;2022+)</td></tr>
+<tr><td>Voortgang en meldingen verspreid dóór de verwerking heen</td><td>Eén gebundeld rapport aan het einde, met doorklikbare fout-links</td></tr>
+<tr><td>Ducts: geen duplicaatcontrole (tweede run = dubbele tags)</td><td>Alle vier: duplicaatcontrole via één snelle set per view</td></tr>
+<tr><td>Duct Fittings: <code>forms.alert</code> werd overschreven, waardoor de debug-vraag altijd "nee" opleverde en meldingen wegvielen</td><td>Override en debug-popup verwijderd; meldingen werken weer gewoon</td></tr>
+<tr><td>Rooms: álle views tegelijk, zonder selectie; één kapotte room kon de hele run stoppen; rapportregels verschenen vóór de uitvoering</td><td>Rooms: view-selectie zoals de andere knoppen, try/except per room, duplicaatcontrole, rapport ná afloop</td></tr>
+<tr><td>Engels en Nederlands door elkaar; emoji in de rapportage</td><td>Nederlandse gebruikersteksten, sobere rapportage conform huisstijl</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl. Alle vier voldoen in v1.1.</p>
+</div>
+</section>
+</section>
+
+<section class="hfd" id="h6">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">06</span><h2>SheetList &mdash; Tekeningenlijst</h2></div><span class="flens"></span></div>
+<!-- ==================== 1 ==================== -->
+<section>
+<h3>6.1 Wat doet dit script?</h3>
+
+<p>Elke sheet in Revit heeft de eigenschap <strong>"Appears In Sheet List"</strong>: staat die aan, dan verschijnt de sheet in de tekeningenlijst (de sheet list-schedule); staat hij uit, dan niet. Normaal moet je die per sheet in de properties aan- of uitvinken. Dit script zet álle sheets in één venster onder elkaar — gesorteerd op sheetnummer, met zoekbalk — en elke checkbox schakelt die eigenschap <strong>direct</strong> in het model.</p>
+
+<h3>6.1.1 De stappen</h3>
+<ol>
+<li><strong>Venster opent</strong> — alle sheets in het project, gesorteerd op sheetnummer, elk met een checkbox die de huidige stand toont.</li>
+<li><strong>Zoeken</strong> — typ in de zoekbalk om de lijst te filteren; alle zoekwoorden moeten in de regel voorkomen ("P- verdieping" vindt alle P-sheets met "verdieping" in de naam).</li>
+<li><strong>Klikken</strong> — elke klik op een checkbox schakelt "Appears In Sheet List" van die sheet, meteen, in het model.</li>
+<li><strong>Sluiten</strong> — via de knop <em>Sluiten</em> of het kruisje; beide zijn gelijk, want de wijzigingen zijn al doorgevoerd.</li>
+<li><strong>Rapport</strong> — na het sluiten toont het output-paneel welke sheets netto zichtbaar zijn gemaakt en welke verborgen (doorklikbaar). Niets gewijzigd? Dan geen rapport.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Live schakelen — bewust ontwerp</span>
+<p>Anders dan de meeste toolbar-knoppen werkt dit script níet met één grote transactie aan het einde: <strong>elke klik is een eigen transactie</strong>. Zo zie je het effect direct (zet de tekeningenlijst-schedule maar eens open naast het venster), en is élke klik afzonderlijk ongedaan te maken met Ctrl+Z. De keerzijde: er is geen "Annuleren, zet alles terug"-knop — terugklikken of Ctrl+Z is de weg terug.</p>
+</div>
+
+<div class="kader k-ok"><span class="lb">Er verdwijnt niets</span>
+<p>Uitvinken <strong>verwijdert geen sheet</strong>: de sheet blijft gewoon bestaan in de Project Browser, met alle views erop. Alleen de vermelding in de tekeningenlijst-schedule gaat aan of uit.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section>
+<h3>6.2 WPF en XAML — een venster in twee bestanden</h3>
+
+<p>Dit is de eerste knop in de reeks met een <strong>eigen venster</strong> in plaats van de standaard pyRevit-keuzelijst. Dat venster is gebouwd met <strong>WPF</strong> (Windows Presentation Foundation, het venster-systeem van .NET — hetzelfde waarmee Revit zelf zijn dialogen bouwt). De knop bestaat daarom uit twee bestanden die samenwerken:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:24%">Bestand</th><th>Rol</th></tr>
+<tr><td><code>UI.xaml</code></td><td>De <strong>vormgeving</strong>: welke elementen er zijn (zoekbalk, lijst, knop, logo), hoe groot, welke kleur, in welke volgorde. Geen logica.</td></tr>
+<tr><td><code>script.py</code></td><td>Het <strong>gedrag</strong>: de lijst vullen, wat er gebeurt bij typen en klikken, de transacties, het rapport.</td></tr>
+</table></div>
+
+<h3>6.2.1 Wat is XAML?</h3>
+<p>XAML is een opmaaktaal voor vensters — vergelijk het met HTML voor webpagina's: geneste elementen met eigenschappen. <code>&lt;StackPanel&gt;</code> stapelt elementen onder elkaar, <code>&lt;TextBox&gt;</code> is een invoerveld, <code>&lt;ListBox&gt;</code> een lijst, <code>&lt;Button&gt;</code> een knop. Wil je een label of kleur aanpassen, dan kan dat in de XAML zonder één regel Python te raken.</p>
+
+<h3>6.2.2 Hoe vinden XAML en Python elkaar?</h3>
+<figure class="code"><figcaption>de koppeling in drie stappen<span>python</span></figcaption>
+<pre><code class="lang-py">class MainWindow(Window):                       # 1. erf van .NET Window
+    def __init__(self):
+        wpf.LoadComponent(self, "UI.xaml")      # 2. laad de XAML in dit object
+        self.populate_listbox()                 #    -> self.UI_listbox bestaat nu
+        self.ShowDialog()                       # 3. toon het venster (blokkerend)</code></pre></figure>
+<p>Drie koppelmechanismen om te onthouden:</p>
+<ol>
+<li><strong><code>x:Name</code> → <code>self.…</code></strong> — elk XAML-element met een naam (<code>x:Name="UI_listbox"</code>) is in Python bereikbaar als <code>self.UI_listbox</code>. Zo vult het script de lijst en leest het de zoekbalk.</li>
+<li><strong>Events → methodes</strong> — <code>TextChanged="UIe_search_text_changed"</code> in de XAML betekent: bij elke toetsaanslag roept WPF de methode met precies die naam aan. Hetzelfde geldt voor <code>Click</code> op de knop. De namen moeten dus exact overeenkomen tussen beide bestanden.</li>
+<li><strong><code>Tag</code> als bagagedrager</strong> — elke checkbox krijgt bij het aanmaken zijn sheet mee in de <code>Tag</code>-eigenschap (een vrij "opbergvakje" dat elk WPF-element heeft). Klik je later, dan weet de handler via <code>sender.Tag</code> meteen om wélke sheet het gaat — zonder iets te hoeven opzoeken.</li>
+</ol>
+
+<div class="kader k-let"><span class="lb">Let op bij aanpassen</span>
+<p>Hernoem je een <code>x:Name</code> of een event-naam in de XAML, dan moet de Python-kant exact mee — anders crasht het venster bij het openen of doet een element niets. En het onderstrepingsteken in sheetnamen: dat wordt door WPF als sneltoets-markering gelezen, daarom zet het script de tekst eerst in een <code>TextBlock</code> in plaats van direct op de checkbox.</p>
+</div>
+
+<h3>6.2.3 De parameter erachter</h3>
+<p>De checkbox schakelt de ingebouwde sheetparameter <code>SHEET_SCHEDULED</code> — de API-naam van "Appears In Sheet List". Het is een ja/nee die als getal is opgeslagen (1&nbsp;=&nbsp;aan, 0&nbsp;=&nbsp;uit); het script leest de huidige waarde en zet de omgekeerde.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section>
+<h3>6.3 Referentie: venster en methodes</h3>
+
+<h3>6.3.1 De elementen in UI.xaml</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:30%">Element</th><th>Wat het doet</th></tr>
+<tr><td><code>UI_search</code> (TextBox)</td><td>De zoekbalk; elke toetsaanslag vuurt <code>UIe_search_text_changed</code>.</td></tr>
+<tr><td><code>UI_listbox</code> (ListBox)</td><td>De sheetlijst; wordt volledig gevuld vanuit Python.</td></tr>
+<tr><td><code>Submit</code> (Button)</td><td>De knop <em>Sluiten</em>; vuurt <code>UIe_btn_run</code>.</td></tr>
+<tr><td><code>logo_BJ</code> (Image)</td><td>Het logo (<code>logo-BJ.png</code> in de knopmap).</td></tr>
+</table></div>
+
+<h3>6.3.2 De methodes in script.py</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Methode / functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>__init__</code></td><td>Laadt de XAML, onthoudt per sheet de <strong>begintoestand</strong> (voor het rapport), vult de lijst en toont het venster met <code>ShowDialog()</code> — het script wacht tot je het sluit.</td></tr>
+<tr><td><code>populate_listbox</code></td><td>Haalt alle sheets op, sorteert op sheetnummer en maakt per sheet een regel. Een onleesbare sheet wordt overgeslagen én geteld; het rapport meldt na afloop hoeveel sheets niet getoond konden worden — stil falen kan niet.</td></tr>
+<tr><td><code>add_listbox_item</code></td><td>Bouwt één regel: TextBlock (nummer_naam), checkbox met de huidige stand, de sheet in <code>Tag</code>, en de klik-koppeling.</td></tr>
+<tr><td><code>UIe_search_text_changed</code></td><td>Filtert de lijst: een regel blijft zichtbaar als <strong>alle</strong> zoekwoorden erin voorkomen; lege zoekbalk toont alles weer.</td></tr>
+<tr><td><code>UIe_toggle_visibility</code></td><td>De kern: leest via <code>sender.Tag</code> de sheet, en schakelt in een eigen transactie <code>SHEET_SCHEDULED</code> om. Mislukt het, dan komt er een foutregel in het output-paneel en blijft het venster gewoon werken.</td></tr>
+<tr><td><code>UIe_btn_run</code></td><td>Sluit het venster; er valt niets te "bevestigen", want elke klik is al doorgevoerd.</td></tr>
+<tr><td><code>report_changes</code></td><td>Vergelijkt na het sluiten de eindstand met de onthouden beginstand en rapporteert alleen de nétto wijzigingen — heen-en-terug geklikte sheets tellen dus niet mee.</td></tr>
+<tr><td><code>main</code></td><td>Opent het venster en draait daarna het rapport.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section>
+<h3>6.4 Vragen uit de tekenkamer — met antwoord</h3>
+
+<div class="oefening">
+<div class="kop">"Ik heb een sheet uitgevinkt — is hij nu weg?"</div>
+<div class="body"><p>Nee. De sheet bestaat gewoon nog (Project Browser, alle views erop intact); alleen de vermelding in de tekeningenlijst-schedule is uit. Weer aanvinken zet hem terug.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik alles annuleren en terugzetten?"</div>
+<div class="body"><p>Er is geen annuleerknop, want elke klik is direct doorgevoerd. Terug kan op twee manieren: de checkbox terugklikken, of (na sluiten) Ctrl+Z — elke klik was een eigen transactie, dus elke Ctrl+Z zet één klik terug. Het rapport toont precies wat er netto veranderd is.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Hoe werkt de zoekbalk precies?"</div>
+<div class="body"><p>Op losse woorden: elke term die je typt moet ergens in de regel (nummer of naam) voorkomen. "P- 01" vindt dus alle sheets met "P-" én "01" erin. Zoekbalk leegmaken toont weer alles.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Maakt het uit of ik op Sluiten klik of op het kruisje?"</div>
+<div class="body"><p>Nee, beide sluiten alleen het venster. De wijzigingen zijn op dat moment al in het model gedaan; het rapport verschijnt in beide gevallen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De tekeningenlijst op mijn sheet verandert niet mee."</div>
+<div class="body"><p>Controleer of die lijst een <strong>sheet list-schedule</strong> is die op "Appears In Sheet List" filtert — dat is de eigenschap die dit script schakelt. Een handgemaakte lijst (getekende tabel of legend) verandert uiteraard niet mee.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik de lijstweergave aanpassen, of het venster?"</div>
+<div class="body"><p>De regelopbouw (nummer_naam) staat als <code>LIST_FORMAT</code> in het CONFIG-blok. Teksten, kleuren en afmetingen van het venster staan in <code>UI.xaml</code> — aanpasbaar zonder Python te raken, zolang je <code>x:Name</code>- en event-namen ongemoeid laat (zie het Let&nbsp;op-kader in &sect;6.2).</p></div>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section>
+<h3>6.5 Wat is er nieuw in v1.2</h3>
+
+<p>De werking die je kent — venster, zoekbalk, live schakelen — is ongewijzigd. v1.2 bouwt bewust dóór op de bewezen v1.0-basis (zelfde imports, zelfde vensterflow, zelfde transactievorm per klik) en voegt daar chirurgisch de huisstijl-onderdelen aan toe:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0</th><th>v1.2</th></tr>
+<tr><td>Reeks ongebruikte imports (<code>select_views</code>, <code>Application</code>, <code>Uri</code>, <code>List</code>)</td><td>Ongebruikte imports verwijderd; de bewezen importbasis van v1.0 is verder bewust intact gelaten</td></tr>
+<tr><td>Dode, uitgecommentarieerde regels in de klik-afhandeling</td><td>Dode code verwijderd; de bewezen transactievorm per klik is behouden (elke klik blijft één Ctrl+Z-stap)</td></tr>
+<tr><td>Geen enkel overzicht van wat er gewijzigd is</td><td>Rapport na sluiten: netto zichtbaar gemaakt / verborgen, met doorklikbare sheets</td></tr>
+<tr><td>Eén onleesbare sheet kon het vullen van de lijst breken — zonder melding</td><td>Per-sheet try/except mét teller: het rapport meldt hoeveel sheets niet getoond konden worden</td></tr>
+<tr><td>XAML met design-placeholder ("Sheet - A"), Engels/emoji-label en knop "Submit!"</td><td>XAML opgeschoond: placeholder weg, "Zoeken:" en "Sluiten", kleuren en logo ongewijzigd</td></tr>
+<tr><td>Vaste regelopbouw in de code</td><td><code>LIST_FORMAT</code> in het CONFIG-blok</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Het venster overleeft een kapotte sheet, elke wijziging is per stuk terug te draaien, en na afloop ligt er een controleerbaar rapport — daarmee voldoet ook deze WPF-knop aan de huisstijl.</p>
+</div>
+</section>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar &middot; Uitleg van de scripts &middot; IDG-UITL-BUNDEL v1.0</span>
+  <span>&copy; 2026 Bram de Jong &mdash; priv&eacute; ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

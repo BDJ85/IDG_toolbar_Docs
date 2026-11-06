@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>IDG Toolbar — Documentatie</title>
+<meta name="description" content="Handleidingen en uitleg bij de scripts van de IDG Toolbar.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+<style>
+/* Aanvulling documentatiesite — alleen bestaande huisstijl-variabelen. */
+.plate .specs b:empty::after{content:"…"}
+.filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 1.6rem}
+.filter input[type=search]{flex:1 1 220px;min-width:0;font:inherit;font-size:.95rem;padding:.55rem .8rem;border:1px solid var(--steel-2);border-radius:4px;background:var(--card);color:var(--ink)}
+.filter input[type=search]:focus{outline:2px solid var(--duct);outline-offset:1px;border-color:var(--duct)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--fm);font-size:12px;letter-spacing:.02em;padding:.35rem .7rem;border:1px solid var(--steel-2);border-radius:999px;background:var(--card);color:var(--ink-2);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--duct);border-color:var(--duct);color:#fff}
+.chip:focus-visible{outline:2px solid var(--duct);outline-offset:2px}
+.groep{margin:0 0 2rem}
+.groep h3{display:flex;align-items:baseline;gap:.6rem;margin-top:.4rem}
+.groep h3 small{font-family:var(--fm);font-size:11px;letter-spacing:.06em;color:var(--ink-2);text-transform:none;font-weight:500}
+.tegels{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.tegel{display:flex;text-decoration:none;color:inherit;background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;overflow:hidden;min-height:150px}
+.tegel .flens{width:9px;flex-shrink:0;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);margin:8px 0 8px 7px}
+.tegel .inhoud{flex:1;padding:14px 16px 12px;display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.tegel .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem}
+.tegel .code{font-family:var(--fm);font-size:11.5px;letter-spacing:.1em;color:var(--duct);font-weight:500;white-space:nowrap}
+.tegel .versie{font-family:var(--fm);font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.tegel .titel{font-family:var(--fd);font-size:1.15rem;font-weight:700;line-height:1.15;color:var(--ink)}
+.tegel .oms{font-size:.9rem;line-height:1.5;color:var(--ink-2);flex:1}
+.tegel .voet{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-family:var(--fm);font-size:11px;color:var(--ink-2);margin-top:.3rem}
+.tegel .voet .fmt{border:1px solid var(--steel);border-radius:3px;padding:.05em .4em;background:var(--duct-bg);color:var(--duct)}
+.tegel:hover,.tegel:focus-visible{border-color:var(--duct);background:var(--duct-bg);outline:none}
+.tegel:focus-visible{box-shadow:0 0 0 2px var(--duct)}
+.tegel.ontbreekt{cursor:default}
+.tegel.ontbreekt .flens{border-color:var(--steel-2)}
+.tegel.ontbreekt .code{color:var(--ink-2)}
+.tegel.ontbreekt:hover{border-color:var(--steel-2);background:var(--card)}
+.tegel .voet .fmt-ontbreekt{background:var(--warn-bg);border-color:var(--seal);color:var(--seal)}
+.bijlagen{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 14px}
+.bijlagen a{font-family:var(--fm);font-size:11.5px;color:var(--duct);border:1px solid var(--steel);border-radius:3px;padding:.15em .55em;background:var(--card);text-decoration:none}
+.bijlagen a:hover{border-color:var(--duct)}
+.leeg{color:var(--ink-2);padding:1.2rem 0}
+@media (prefers-reduced-motion:no-preference){.tegel{transition:border-color .12s,background-color .12s}}
+@media print{.filter{display:none}.tegel{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · documentatie</span>
+  <h1>Documentatie IDG Toolbar</h1>
+  <p class="sub">Handleidingen en uitleg bij de scripts van de tekenkamer. Elk document opent als eigen pagina; de code op de tegel is de code in het typeplaatje van het document.</p>
+  <div class="specs">
+    <span>Documenten <b id="spec-aantal"></b></span>
+    <span>Bijgewerkt <b id="spec-datum"></b></span>
+    <span>Beheer <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<div class="filter" role="search">
+  <input type="search" id="zoek" placeholder="Zoek op code, titel of onderwerp" aria-label="Zoek in de documentatie" autocomplete="off">
+  <div class="chips" id="chips" role="group" aria-label="Filter op soort"></div>
+</div>
+
+<div id="lijst" aria-live="polite"><p class="leeg">Register wordt geladen…</p></div>
+
+<div class="kader k-tip"><span class="lb">Klopt er iets niet?</span>
+<p>Mis je een document, of staat er een versie die niet overeenkomt met wat je in Revit ziet? Meld het bij Bram — het register wordt bij elke wijziging bijgewerkt.</p>
+</div>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · Documentatie · register v<span id="foot-versie"></span></span>
+  <span>&copy; 2026 Bram de Jong &mdash; priv&eacute; ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+<!-- SITE:JS -->
+<script>
+(function(){
+  'use strict';
+  var MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  var lijst = document.getElementById('lijst');
+  var chips = document.getElementById('chips');
+  var zoek  = document.getElementById('zoek');
+  var data = null, actiefSoort = 'ALLES';
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function maand(jjjjmm){
+    if(!jjjjmm) return '';
+    var d = String(jjjjmm).split('-');
+    var m = parseInt(d[1], 10);
+    return (m >= 1 && m <= 12 ? MAANDEN[m-1] + ' ' : '') + d[0];
+  }
+
+  function publiek(){
+    return data.documenten.filter(function(d){ return d.publiek === true && d.status === 'actief'; });
+  }
+
+  function zichtbaar(){
+    var q = (zoek.value || '').trim().toLowerCase();
+    return publiek().filter(function(d){
+      if(actiefSoort !== 'ALLES' && d.soort !== actiefSoort) return false;
+      if(!q) return true;
+      var hooi = [d.code, d.titel, d.omschrijving, d.doelgroep].join(' ').toLowerCase();
+      return hooi.indexOf(q) !== -1;
+    });
+  }
+
+  function soortVolgorde(k){ var s = data.soorten[k]; return s ? s.volgorde : 99; }
+  function soortLabel(k){ var s = data.soorten[k]; return s ? s.label : k; }
+
+  function renderChips(){
+    var tel = {};
+    publiek().forEach(function(d){ tel[d.soort] = (tel[d.soort] || 0) + 1; });
+    var keys = Object.keys(tel).sort(function(a,b){ return soortVolgorde(a) - soortVolgorde(b); });
+    var html = chip('ALLES', 'Alles', publiek().length);
+    keys.forEach(function(k){ html += chip(k, soortLabel(k), tel[k]); });
+    chips.innerHTML = html;
+  }
+  function chip(k, label, n){
+    return '<button type="button" class="chip" data-soort="' + esc(k) + '" aria-pressed="' + (k === actiefSoort) + '">' +
+           esc(label) + ' <span aria-hidden="true">' + n + '</span></button>';
+  }
+
+  function tegel(d){
+    var heeftBestand = !!d.bestand;
+    var tag = heeftBestand ? 'a' : 'div';
+    var attrs = heeftBestand ? ' href="' + esc(d.bestand) + '"' : ' aria-disabled="true" title="Bestand is nog niet geplaatst"';
+    var fmts = (d.formaat || []).map(function(f){ return '<span class="fmt">' + esc(f.toUpperCase()) + '</span>'; }).join('');
+    var html = '<' + tag + ' class="tegel' + (heeftBestand ? '' : ' ontbreekt') + '"' + attrs + '>' +
+      '<span class="flens"></span><span class="inhoud">' +
+        '<span class="kop"><span class="code">' + esc(d.code) + '</span><span class="versie">v' + esc(d.versie) + '</span></span>' +
+        '<span class="titel">' + esc(d.titel) + '</span>' +
+        '<span class="oms">' + esc(d.omschrijving) + '</span>' +
+        '<span class="voet">' + fmts + '<span>' + esc(maand(d.bijgewerkt)) + '</span></span>' +
+      '</span></' + tag + '>';
+    return html;
+  }
+
+  function bijlagen(d){
+    if(!d.bijlagen || !d.bijlagen.length) return '';
+    return '<div class="bijlagen">' + d.bijlagen.map(function(b){
+      return '<a href="' + esc(b.bestand) + '">' + esc(d.code) + ' · ' + esc(b.label) + '</a>';
+    }).join('') + '</div>';
+  }
+
+  function render(){
+    var docs = zichtbaar();
+    if(!docs.length){
+      lijst.innerHTML = '<p class="leeg">Geen documenten gevonden. Pas de zoekterm of het filter aan.</p>';
+      return;
+    }
+    var groepen = {};
+    docs.forEach(function(d){ (groepen[d.soort] = groepen[d.soort] || []).push(d); });
+    var keys = Object.keys(groepen).sort(function(a,b){ return soortVolgorde(a) - soortVolgorde(b); });
+    var html = '';
+    keys.forEach(function(k){
+      var g = groepen[k].sort(function(a,b){ return a.titel.localeCompare(b.titel, 'nl'); });
+      html += '<section class="groep"><h3>' + esc(soortLabel(k)) + '<small>' + g.length + ' ' + (g.length === 1 ? 'document' : 'documenten') + '</small></h3>';
+      html += '<div class="tegels">' + g.map(tegel).join('') + '</div>';
+      var extra = g.map(bijlagen).join('');
+      if(extra) html += '<div style="margin-top:14px">' + extra + '</div>';
+      html += '</section>';
+    });
+    lijst.innerHTML = html;
+    controleerBestanden();
+  }
+
+  // Vraagt per tegel met een lichte HEAD-aanroep of het bestand bestaat.
+  // Bestaat het niet (404), dan wordt de tegel grijs en niet-klikbaar.
+  function controleerBestanden(){
+    var tegels = lijst.querySelectorAll('a.tegel[href], .bijlagen a[href]');
+    Array.prototype.forEach.call(tegels, function(a){
+      var isBijlage = a.className.indexOf('tegel') === -1;
+      var href = a.getAttribute('href');
+      var x = new XMLHttpRequest();
+      x.open('HEAD', href, true);
+      x.onreadystatechange = function(){
+        if(x.readyState !== 4) return;
+        if(x.status >= 400){
+          if(isBijlage){ a.parentNode.removeChild(a); return; }
+          a.className += ' ontbreekt';
+          a.removeAttribute('href');
+          a.setAttribute('aria-disabled', 'true');
+          a.setAttribute('title', 'Bestand is nog niet geplaatst');
+          var voet = a.querySelector('.voet');
+          if(voet) voet.innerHTML = '<span class="fmt fmt-ontbreekt">nog niet geplaatst</span>';
+        }
+      };
+      x.send();
+    });
+  }
+
+  function specs(){
+    document.getElementById('spec-aantal').textContent = String(publiek().length);
+    var laatst = publiek().map(function(d){ return d.bijgewerkt || ''; }).sort().pop();
+    document.getElementById('spec-datum').textContent = maand(laatst) || '–';
+    document.getElementById('foot-versie').textContent = data.versie_register || '';
+  }
+
+  chips.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.chip') : null;
+    if(!b) return;
+    actiefSoort = b.getAttribute('data-soort');
+    renderChips(); render();
+  });
+  zoek.addEventListener('input', render);
+
+  var xhr = new XMLHttpRequest();
+  // Absoluut pad: ook als deze pagina ooit op een dieper pad wordt getoond,
+  // wordt het register vanaf de siteroot geladen.
+  xhr.open('GET', '/register.json?v=' + Date.now(), true);
+  xhr.onreadystatechange = function(){
+    if(xhr.readyState !== 4) return;
+    if(xhr.status === 200 || (xhr.status === 0 && xhr.responseText)){
+      try { data = JSON.parse(xhr.responseText); }
+      catch(err){
+        if(/^\s*</.test(xhr.responseText)) return fout('register.json ontbreekt in de root van de site; de server gaf een HTML-pagina terug in plaats van het register.');
+        return fout('register.json is geen geldige JSON: ' + err.message);
+      }
+      specs(); renderChips(); render();
+    } else {
+      fout('Het register kon niet worden geladen (status ' + xhr.status + '). Open de site via het webadres, niet als los bestand.');
+    }
+  };
+  xhr.send();
+
+  function fout(msg){
+    lijst.innerHTML = '<div class="kader k-let"><span class="lb">Register niet geladen</span><p>' + esc(msg) + '</p></div>';
+  }
+})();
+</script>
+<!-- /SITE:JS -->
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

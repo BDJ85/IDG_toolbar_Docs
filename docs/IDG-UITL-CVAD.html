@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDG Toolbar — CVAD: Copy Views As Dependent</title>
+<meta name="description" content="Uitleg van het CVAD-script (Dependent views v1.1): dependent views maken met scope boxes — per schacht, kavel of appartement, in een actie.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne handleiding</span>
+  <h1>CVAD — Copy Views As Dependent</h1>
+  <p class="sub">In gewone taal: wat het script doet, hoe het is opgebouwd, en de antwoorden op de vragen die je er waarschijnlijk over hebt. Voor het maken van dependent views mét scope box in één actie — bijvoorbeeld een schachtenplan per schacht per verdieping, of views per kavel of appartement.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-CVAD</b></span>
+    <span>Versie <b>1.1</b></span>
+    <span>Hoort bij <b>Dependent views v1.1</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Wat doet dit script?</h2></div><span class="flens"></span></div>
+
+<p>Je kiest één of meer plattegrond-views en één of meer scope boxes. Het script maakt daarna van <strong>elke gekozen view</strong> voor <strong>elke gekozen scope box</strong> een <strong>dependent view</strong>: een "kind-view" die aan de originele view vasthangt, met die scope box direct toegepast als uitsnede en de croprand onzichtbaar gezet. De naam wordt automatisch "&lt;viewnaam&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box-naam&gt;".</p>
+
+<p>Het klassieke gebruik: je hebt per verdieping één plattegrond en per schacht één scope box. Selecteer 5 verdiepingsviews en 4 schacht-scope-boxes, en je hebt met één klik 5&nbsp;×&nbsp;4&nbsp;=&nbsp;20 schachtenplannen — netjes benoemd, correct uitgesneden, klaar om op sheets te zetten. Hetzelfde principe werkt voor views per kavel of per appartement.</p>
+
+<h3>1.1 De stappen</h3>
+<ol>
+<li><strong>Verzamelen</strong> — alle bruikbare views (Floor Plans, Ceiling Plans en Area Plans; geen templates) en alle scope boxes, allebei gesorteerd op naam voor een overzichtelijke lijst.</li>
+<li><strong>Views kiezen</strong> — eerste keuzelijst (meerdere mogelijk). Annuleren = netjes stoppen, zonder iets te wijzigen.</li>
+<li><strong>Scope boxes kiezen</strong> — tweede keuzelijst (meerdere mogelijk). Ook hier: annuleren = netjes stoppen.</li>
+<li><strong>Aanmaken</strong> — binnen één transactie wordt per combinatie (view&nbsp;×&nbsp;scope&nbsp;box) een dependent view gemaakt, benoemd, van scope box voorzien en de croprand verborgen. Combinaties waarvan de naam al bestaat worden <strong>overgeslagen</strong>; een fout bij één combinatie stopt de rest niet.</li>
+<li><strong>Rapporteren</strong> — overzicht in het output-paneel: aangemaakt (doorklikbaar), overgeslagen, fouten.</li>
+</ol>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Het script is <strong>idempotent</strong>: combinaties waarvan de viewnaam al bestaat worden overgeslagen (<code>SKIP_EXISTING</code>). Twee keer draaien levert dus nooit dubbele views of foutmeldingen over dubbele namen op.</p>
+</div>
+
+<div class="kader k-tip"><span class="lb">Dependent view ≠ gewone kopie</span>
+<p>Een <strong>dependent view</strong> is geen losse duplicaat maar een kind van de originele view: annotaties, view-instellingen en het template lopen mee met de ouder. Precies wat je wilt voor deelplannen — pas je de ouder aan, dan volgen alle schacht- of kavelviews vanzelf. In de Project Browser hangen ze ingesprongen ónder hun ouder.</p>
+</div>
+
+<div class="kader k-tip"><span class="lb">Wat is een scope box?</span>
+<p>Een scope box is een benoemd 3D-kader in het model (categorie "Volume of Interest"). Wijs je hem toe aan een view, dan wordt de crop van die view exact dat kader — op élke verdieping hetzelfde. Eén scope box "Schacht&nbsp;2" geeft dus op alle verdiepingen dezelfde uitsnede. Daarom is de combinatie scope&nbsp;box&nbsp;+&nbsp;dependent&nbsp;view zo sterk.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Begrippen in dít script</h2></div><span class="flens"></span></div>
+
+<p>De algemene basis (variabelen, functies, try/except, lambda, Pylint, het verschil Python/IronPython/Dynamo) staat in het zusterdocument <strong>IDG-UITL-OPST</strong>. Hier alleen wat je nodig hebt om dít script te lezen.</p>
+
+<h3>2.1 Het CONFIG-blok — de instellingen van dit script</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Constante</th><th>Betekenis</th></tr>
+<tr><td><code>ALLOWED_VIEW_TYPES</code></td><td>Welke viewtypes in de keuzelijst komen: Floor&nbsp;Plan, Ceiling&nbsp;Plan, Area&nbsp;Plan.</td></tr>
+<tr><td><code>NAME_TEMPLATE</code></td><td>Het naamsjabloon, standaard <code>"{parent} - {box}"</code>. Wil je een andere naamgeving, dan pas je alléén deze regel aan.</td></tr>
+<tr><td><code>SKIP_EXISTING</code></td><td>Bestaande viewnamen overslaan (aan). Dit maakt het script veilig om opnieuw te draaien.</td></tr>
+<tr><td><code>HIDE_CROP_REGION</code></td><td>Croprand onzichtbaar zetten op de nieuwe views (aan).</td></tr>
+</table></div>
+
+<h3>2.2 De transactie — nu via de context manager</h3>
+<figure class="code"><figcaption>automatische rollback bij een fout<span>python</span></figcaption>
+<pre><code class="lang-py">with revit.Transaction("CVAD: dependent views met scope boxes"):
+    for parent_view in sel_views:
+        for scope_box in sel_boxes:
+            try:
+                # ... dependent view aanmaken ...
+                pass
+            except Exception as ex:
+                errors.append((parent_view.Name, scope_box.Name, str(ex)))</code></pre></figure>
+<p>Het <code>with</code>-blok start de transactie en sluit hem gegarandeerd weer af — óók als er iets misgaat, dan rolt Revit alle wijzigingen automatisch terug. Daarbinnen heeft elke combinatie zijn eigen <code>try</code>/<code>except</code>: één kapotte combinatie wordt genoteerd in de foutenlijst en de rest gaat gewoon door. Het hele resultaat is achteraf één Ctrl+Z.</p>
+
+<h3>2.3 Selectie op élement, niet op naam</h3>
+<p>De keuzelijsten geven nu rechtstreeks de gekozen <strong>Revit-elementen</strong> terug (via <code>name_attr='Name'</code> toont pyRevit gewoon de naam in de lijst). In v1.0 kreeg het script alleen namen terug en moest het daarna het bijbehorende element terugzoeken — wat mis kon gaan bij twee elementen met dezelfde naam. Dat terugzoeken bestaat niet meer.</p>
+
+<h3>2.4 De set met bestaande namen</h3>
+<figure class="code"><figcaption>bestaande namen, hoofdletterongevoelig<span>python</span></figcaption>
+<pre><code class="lang-py">names = set()
+for v in FilteredElementCollector(document).OfClass(View).ToElements():
+    names.add(v.Name.lower())</code></pre></figure>
+<p>Een <strong>set</strong> is een verzameling zonder dubbelen waarin opzoeken razendsnel is. Alle bestaande viewnamen gaan er in kleine letters in (Revit-namen zijn hoofdletterongevoelig); per combinatie checkt het script "bestaat deze naam al?" en elke nieuw aangemaakte naam wordt direct toegevoegd — zodat ook bínnen één run geen dubbele namen kunnen ontstaan.</p>
+
+<h3>2.5 Expliciete imports</h3>
+<p>v1.0 gebruikte <code>from Autodesk.Revit.DB import *</code> (alles in één keer). v1.1 benoemt precies wat het gebruikt: <code>FilteredElementCollector</code>, <code>BuiltInCategory</code>, <code>BuiltInParameter</code>, <code>View</code>, <code>ViewType</code>, <code>ViewDuplicateOption</code>. Zo zie je in één oogopslag waar het script op leunt, en de Dynamo-referentie (<code>RevitServices</code>) — die hier nooit thuishoorde — is verwijderd.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Functie-voor-functie referentie</h2></div><span class="flens"></span></div>
+
+<h3>3.1 De vier functies</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_project_views(document)</code></td><td>Verzamelt alle views en filtert: <strong>geen</strong> view templates, alleen de viewtypes uit <code>ALLOWED_VIEW_TYPES</code>. Een view die zijn eigenschappen niet prijsgeeft (corrupt element) wordt stilletjes overgeslagen in plaats van het script te laten crashen.</td></tr>
+<tr><td><code>get_scope_boxes(document)</code></td><td>Verzamelt alle scope boxes: categorie <code>OST_VolumeOfInterest</code> ("Volume of Interest" is de interne Revit-naam voor scope boxes).</td></tr>
+<tr><td><code>collect_existing_view_names(document)</code></td><td>Bouwt de set met alle bestaande viewnamen in kleine letters — de basis voor <code>SKIP_EXISTING</code> (zie&nbsp;2.4).</td></tr>
+<tr><td><code>create_dependent_view(document, parent_view, scope_box, new_name)</code></td><td>Het werkpaard, vier stappen: (1)&nbsp;<code>Duplicate(ViewDuplicateOption.AsDependent)</code> maakt de dependent duplicate — dat geeft een Id terug, dus (2) haalt <code>doc.GetElement(...)</code> het echte view-element op; (3) de meegegeven naam wordt gezet; (4) via twee ingebouwde parameters wordt de scope box toegewezen (<code>VIEWER_VOLUME_OF_INTEREST_CROP</code>) en de croprand verborgen (<code>VIEWER_CROP_REGION_VISIBLE</code>&nbsp;=&nbsp;0 — een ja/nee als getal). Beide parameters worden eerst gecontroleerd op bestaan én schrijfbaarheid.</td></tr>
+</table></div>
+
+<h3>3.2 De hoofdroutine main()</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Stap</th><th>Wat gebeurt er</th></tr>
+<tr><td><strong>1. Verzamelen + controleren</strong></td><td>Views en scope boxes ophalen; is één van beide leeg, dan stopt het script met een duidelijke melding. Beide lijsten worden op naam gesorteerd (met een lambda als sorteersleutel — zie IDG-UITL-OPST&nbsp;§2.5).</td></tr>
+<tr><td><strong>2-3. Twee keuzelijsten</strong></td><td><code>forms.SelectFromList.show(..., name_attr='Name', multiselect=True)</code>: eerst views, dan scope boxes. Na élke lijst een cancel-check: <code>if not sel_...: script.exit()</code> — annuleren stopt het script netjes, zonder foutmelding en zonder wijziging.</td></tr>
+<tr><td><strong>4. Aanmaken</strong></td><td>De dubbele lus (het <strong>kruisproduct</strong>: elke view × elke scope box) binnen de context-managertransactie, met per combinatie: naam bouwen via <code>NAME_TEMPLATE</code> → bestaat al? overslaan → anders aanmaken → naam aan de set toevoegen. Fouten per combinatie worden verzameld, niet fataal.</td></tr>
+<tr><td><strong>5. Rapporteren</strong></td><td><code>output.print_md</code>: aantallen aangemaakt / overgeslagen / fouten, gevolgd door de drie lijsten. Aangemaakte views zijn <strong>doorklikbaar</strong> via <code>output.linkify</code> — klik en Revit springt naar de view.</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo controleer je het resultaat</span>
+<p>Open het rapport in het output-paneel en klik een aangemaakte view aan — of open de Project Browser: onder elke geselecteerde ouder-view hangen ingesprongen kind-views met de naam "&lt;ouder&gt;&nbsp;-&nbsp;&lt;scope&nbsp;box&gt;". De uitsnede volgt exact de scope box, zonder zichtbare croprand.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Vragen uit de tekenkamer — met antwoord</h2></div><span class="flens"></span></div>
+
+<div class="oefening">
+<div class="kop">"Hoeveel views krijg ik precies?"</div>
+<div class="body"><p>Aantal gekozen views × aantal gekozen scope boxes. Élke view krijgt élke scope box. Wil je per verdieping verschillende schachten, draai het script dan per groep apart — dankzij het overslaan van bestaande namen kan dat veilig in meerdere rondes.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat gebeurt er als ik op Annuleren klik?"</div>
+<div class="body"><p>Het script stopt netjes, zonder foutmelding en zonder iets in het model te wijzigen. Dat geldt voor beide keuzelijsten.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide het script twee keer — nu dubbele views?"</div>
+<div class="body"><p>Nee. Combinaties waarvan de viewnaam al bestaat worden overgeslagen en verschijnen in het rapport onder "Overgeslagen". Het script is veilig om opnieuw te draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom staat mijn doorsnede/3D-view niet in de lijst?"</div>
+<div class="body"><p>Bewust: het script toont alleen Floor Plans, Ceiling Plans en Area Plans (en geen view templates) — zie <code>ALLOWED_VIEW_TYPES</code> in het CONFIG-blok. Dependent views met scope boxes zijn een plattegrond-werkwijze.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik de naamgeving aanpassen?"</div>
+<div class="body"><p>Ja, zonder te programmeren: pas <code>NAME_TEMPLATE</code> aan in het CONFIG-blok, bijvoorbeeld <code>"{box} ({parent})"</code>. De bouwstenen <code>{parent}</code> en <code>{box}</code> worden vervangen door de viewnaam en de scope box-naam.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Twee scope boxes heten hetzelfde — wat gebeurt er?"</div>
+<div class="body"><p>De namen van de nieuwe views worden dan identiek, dus de tweede combinatie wordt overgeslagen als "bestaat al". Geef je scope boxes unieke, betekenisvolle namen (bijv. "Schacht&nbsp;1", "Schacht&nbsp;2") vóór je het script draait — die namen komen ook in de viewnamen terug.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De uitsnede klopt, maar ik zie geen croprand — hoort dat?"</div>
+<div class="body"><p>Ja: <code>HIDE_CROP_REGION</code> staat aan voor een schoon beeld. De crop ís er wel (de scope box bepaalt hem); alleen de rand is verborgen. Aanzetten kan per view in de properties, of structureel via het CONFIG-blok.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Volgen de dependent views het view template van de ouder?"</div>
+<div class="body"><p>Ja — dat is precies de kracht van dependent views: template, zichtbaarheidsinstellingen en annotaties van de ouder gelden ook voor de kinderen. Pas de ouder aan en alle schacht-/kavelviews volgen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Eén combinatie gaf een fout — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Elke combinatie heeft zijn eigen foutafhandeling: de rest is gewoon aangemaakt en de fout staat met view- en scope box-naam in het rapport. Los de oorzaak op en draai opnieuw — de gelukte combinaties worden dan overgeslagen.</p></div>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>Wat is er nieuw in v1.1</h2></div><span class="flens"></span></div>
+
+<p>v1.1 brengt het script naar de huisstijl van de nieuwere toolbar-scripts (zoals Opstellingen). De werking voor jou als gebruiker is hetzelfde gebleven — er zijn vangnetten en gemak bijgekomen:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0 (2024)</th><th>v1.1 (2026)</th></tr>
+<tr><td>Annuleren gaf een rode foutmelding</td><td>Cancel-check na elke keuzelijst: annuleren stopt netjes, zonder wijziging</td></tr>
+<tr><td>Eén fout (bijv. dubbele naam) stopte de hele batch</td><td>Try/except per combinatie: fouten worden verzameld en gerapporteerd, de rest gaat door</td></tr>
+<tr><td>Tweede run crashte op bestaande namen</td><td><code>SKIP_EXISTING</code>: bestaande namen worden overgeslagen — veilig om opnieuw te draaien</td></tr>
+<tr><td>Handmatige transactie (<code>Start()</code>/<code>Commit()</code>), geen rollback bij een fout</td><td>Context manager <code>with revit.Transaction(...)</code>: automatische rollback</td></tr>
+<tr><td>Keuzelijsten op naam + terugzoeken met <code>next()</code></td><td>Selectie geeft de elementen zelf terug — geen naam-terugzoeken, geen verwisseling bij dubbele namen</td></tr>
+<tr><td>Pop-up "successfully created"</td><td>Rapport in het output-paneel: aangemaakt (doorklikbaar via <code>linkify</code>), overgeslagen, fouten</td></tr>
+<tr><td><code>import *</code> + Dynamo-referentie (<code>RevitServices</code>)</td><td>Expliciete imports, Dynamo-referentie verwijderd</td></tr>
+<tr><td>Vaste naamgeving en gedrag in de code</td><td>CONFIG-blok: naamsjabloon, viewtypes, overslaan en croprand instelbaar zonder programmeren</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl. v1.1 voldoet op alle drie.</p>
+</div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · CVAD — Copy Views As Dependent · IDG-UITL-CVAD v1.1 · hoort bij Dependent views v1.1</span>
+  <span>© 2026 Bram de Jong — privé ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

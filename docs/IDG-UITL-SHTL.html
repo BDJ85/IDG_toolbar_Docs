@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDG Toolbar — SheetList: Tekeningenlijst</title>
+<meta name="description" content="Uitleg van het SheetList-script (v1.2): sheets aan- en uitzetten in de tekeningenlijst via een WPF-venster met zoekbalk — inclusief uitleg van WPF en XAML.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne handleiding</span>
+  <h1>SheetList — Tekeningenlijst</h1>
+  <p class="sub">In gewone taal: wat het script doet, hoe een WPF-venster met XAML werkt, en de antwoorden op de vragen die je er waarschijnlijk over hebt. Voor het snel aan- en uitzetten van sheets in de tekeningenlijst — met zoekbalk, live in het model.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-SHTL</b></span>
+    <span>Versie <b>1.2</b></span>
+    <span>Hoort bij <b>SheetList v1.2</b></span>
+    <span>Engine <b>IronPython 2.7 + WPF</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Wat doet dit script?</h2></div><span class="flens"></span></div>
+
+<p>Elke sheet in Revit heeft de eigenschap <strong>"Appears In Sheet List"</strong>: staat die aan, dan verschijnt de sheet in de tekeningenlijst (de sheet list-schedule); staat hij uit, dan niet. Normaal moet je die per sheet in de properties aan- of uitvinken. Dit script zet álle sheets in één venster onder elkaar — gesorteerd op sheetnummer, met zoekbalk — en elke checkbox schakelt die eigenschap <strong>direct</strong> in het model.</p>
+
+<h3>1.1 De stappen</h3>
+<ol>
+<li><strong>Venster opent</strong> — alle sheets in het project, gesorteerd op sheetnummer, elk met een checkbox die de huidige stand toont.</li>
+<li><strong>Zoeken</strong> — typ in de zoekbalk om de lijst te filteren; alle zoekwoorden moeten in de regel voorkomen ("P- verdieping" vindt alle P-sheets met "verdieping" in de naam).</li>
+<li><strong>Klikken</strong> — elke klik op een checkbox schakelt "Appears In Sheet List" van die sheet, meteen, in het model.</li>
+<li><strong>Sluiten</strong> — via de knop <em>Sluiten</em> of het kruisje; beide zijn gelijk, want de wijzigingen zijn al doorgevoerd.</li>
+<li><strong>Rapport</strong> — na het sluiten toont het output-paneel welke sheets netto zichtbaar zijn gemaakt en welke verborgen (doorklikbaar). Niets gewijzigd? Dan geen rapport.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Live schakelen — bewust ontwerp</span>
+<p>Anders dan de meeste toolbar-knoppen werkt dit script níet met één grote transactie aan het einde: <strong>elke klik is een eigen transactie</strong>. Zo zie je het effect direct (zet de tekeningenlijst-schedule maar eens open naast het venster), en is élke klik afzonderlijk ongedaan te maken met Ctrl+Z. De keerzijde: er is geen "Annuleren, zet alles terug"-knop — terugklikken of Ctrl+Z is de weg terug.</p>
+</div>
+
+<div class="kader k-ok"><span class="lb">Er verdwijnt niets</span>
+<p>Uitvinken <strong>verwijdert geen sheet</strong>: de sheet blijft gewoon bestaan in de Project Browser, met alle views erop. Alleen de vermelding in de tekeningenlijst-schedule gaat aan of uit.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>WPF en XAML — een venster in twee bestanden</h2></div><span class="flens"></span></div>
+
+<p>Dit is de eerste knop in de reeks met een <strong>eigen venster</strong> in plaats van de standaard pyRevit-keuzelijst. Dat venster is gebouwd met <strong>WPF</strong> (Windows Presentation Foundation, het venster-systeem van .NET — hetzelfde waarmee Revit zelf zijn dialogen bouwt). De knop bestaat daarom uit twee bestanden die samenwerken:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:24%">Bestand</th><th>Rol</th></tr>
+<tr><td><code>UI.xaml</code></td><td>De <strong>vormgeving</strong>: welke elementen er zijn (zoekbalk, lijst, knop, logo), hoe groot, welke kleur, in welke volgorde. Geen logica.</td></tr>
+<tr><td><code>script.py</code></td><td>Het <strong>gedrag</strong>: de lijst vullen, wat er gebeurt bij typen en klikken, de transacties, het rapport.</td></tr>
+</table></div>
+
+<h3>2.1 Wat is XAML?</h3>
+<p>XAML is een opmaaktaal voor vensters — vergelijk het met HTML voor webpagina's: geneste elementen met eigenschappen. <code>&lt;StackPanel&gt;</code> stapelt elementen onder elkaar, <code>&lt;TextBox&gt;</code> is een invoerveld, <code>&lt;ListBox&gt;</code> een lijst, <code>&lt;Button&gt;</code> een knop. Wil je een label of kleur aanpassen, dan kan dat in de XAML zonder één regel Python te raken.</p>
+
+<h3>2.2 Hoe vinden XAML en Python elkaar?</h3>
+<figure class="code"><figcaption>de koppeling in drie stappen<span>python</span></figcaption>
+<pre><code class="lang-py">class MainWindow(Window):                       # 1. erf van .NET Window
+    def __init__(self):
+        wpf.LoadComponent(self, "UI.xaml")      # 2. laad de XAML in dit object
+        self.populate_listbox()                 #    -> self.UI_listbox bestaat nu
+        self.ShowDialog()                       # 3. toon het venster (blokkerend)</code></pre></figure>
+<p>Drie koppelmechanismen om te onthouden:</p>
+<ol>
+<li><strong><code>x:Name</code> → <code>self.…</code></strong> — elk XAML-element met een naam (<code>x:Name="UI_listbox"</code>) is in Python bereikbaar als <code>self.UI_listbox</code>. Zo vult het script de lijst en leest het de zoekbalk.</li>
+<li><strong>Events → methodes</strong> — <code>TextChanged="UIe_search_text_changed"</code> in de XAML betekent: bij elke toetsaanslag roept WPF de methode met precies die naam aan. Hetzelfde geldt voor <code>Click</code> op de knop. De namen moeten dus exact overeenkomen tussen beide bestanden.</li>
+<li><strong><code>Tag</code> als bagagedrager</strong> — elke checkbox krijgt bij het aanmaken zijn sheet mee in de <code>Tag</code>-eigenschap (een vrij "opbergvakje" dat elk WPF-element heeft). Klik je later, dan weet de handler via <code>sender.Tag</code> meteen om wélke sheet het gaat — zonder iets te hoeven opzoeken.</li>
+</ol>
+
+<div class="kader k-let"><span class="lb">Let op bij aanpassen</span>
+<p>Hernoem je een <code>x:Name</code> of een event-naam in de XAML, dan moet de Python-kant exact mee — anders crasht het venster bij het openen of doet een element niets. En het onderstrepingsteken in sheetnamen: dat wordt door WPF als sneltoets-markering gelezen, daarom zet het script de tekst eerst in een <code>TextBlock</code> in plaats van direct op de checkbox.</p>
+</div>
+
+<h3>2.3 De parameter erachter</h3>
+<p>De checkbox schakelt de ingebouwde sheetparameter <code>SHEET_SCHEDULED</code> — de API-naam van "Appears In Sheet List". Het is een ja/nee die als getal is opgeslagen (1&nbsp;=&nbsp;aan, 0&nbsp;=&nbsp;uit); het script leest de huidige waarde en zet de omgekeerde.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Referentie: venster en methodes</h2></div><span class="flens"></span></div>
+
+<h3>3.1 De elementen in UI.xaml</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:30%">Element</th><th>Wat het doet</th></tr>
+<tr><td><code>UI_search</code> (TextBox)</td><td>De zoekbalk; elke toetsaanslag vuurt <code>UIe_search_text_changed</code>.</td></tr>
+<tr><td><code>UI_listbox</code> (ListBox)</td><td>De sheetlijst; wordt volledig gevuld vanuit Python.</td></tr>
+<tr><td><code>Submit</code> (Button)</td><td>De knop <em>Sluiten</em>; vuurt <code>UIe_btn_run</code>.</td></tr>
+<tr><td><code>logo_BJ</code> (Image)</td><td>Het logo (<code>logo-BJ.png</code> in de knopmap).</td></tr>
+</table></div>
+
+<h3>3.2 De methodes in script.py</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Methode / functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>__init__</code></td><td>Laadt de XAML, onthoudt per sheet de <strong>begintoestand</strong> (voor het rapport), vult de lijst en toont het venster met <code>ShowDialog()</code> — het script wacht tot je het sluit.</td></tr>
+<tr><td><code>populate_listbox</code></td><td>Haalt alle sheets op, sorteert op sheetnummer en maakt per sheet een regel. Een onleesbare sheet wordt overgeslagen én geteld; het rapport meldt na afloop hoeveel sheets niet getoond konden worden — stil falen kan niet.</td></tr>
+<tr><td><code>add_listbox_item</code></td><td>Bouwt één regel: TextBlock (nummer_naam), checkbox met de huidige stand, de sheet in <code>Tag</code>, en de klik-koppeling.</td></tr>
+<tr><td><code>UIe_search_text_changed</code></td><td>Filtert de lijst: een regel blijft zichtbaar als <strong>alle</strong> zoekwoorden erin voorkomen; lege zoekbalk toont alles weer.</td></tr>
+<tr><td><code>UIe_toggle_visibility</code></td><td>De kern: leest via <code>sender.Tag</code> de sheet, en schakelt in een eigen transactie <code>SHEET_SCHEDULED</code> om. Mislukt het, dan komt er een foutregel in het output-paneel en blijft het venster gewoon werken.</td></tr>
+<tr><td><code>UIe_btn_run</code></td><td>Sluit het venster; er valt niets te "bevestigen", want elke klik is al doorgevoerd.</td></tr>
+<tr><td><code>report_changes</code></td><td>Vergelijkt na het sluiten de eindstand met de onthouden beginstand en rapporteert alleen de nétto wijzigingen — heen-en-terug geklikte sheets tellen dus niet mee.</td></tr>
+<tr><td><code>main</code></td><td>Opent het venster en draait daarna het rapport.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Vragen uit de tekenkamer — met antwoord</h2></div><span class="flens"></span></div>
+
+<div class="oefening">
+<div class="kop">"Ik heb een sheet uitgevinkt — is hij nu weg?"</div>
+<div class="body"><p>Nee. De sheet bestaat gewoon nog (Project Browser, alle views erop intact); alleen de vermelding in de tekeningenlijst-schedule is uit. Weer aanvinken zet hem terug.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik alles annuleren en terugzetten?"</div>
+<div class="body"><p>Er is geen annuleerknop, want elke klik is direct doorgevoerd. Terug kan op twee manieren: de checkbox terugklikken, of (na sluiten) Ctrl+Z — elke klik was een eigen transactie, dus elke Ctrl+Z zet één klik terug. Het rapport toont precies wat er netto veranderd is.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Hoe werkt de zoekbalk precies?"</div>
+<div class="body"><p>Op losse woorden: elke term die je typt moet ergens in de regel (nummer of naam) voorkomen. "P- 01" vindt dus alle sheets met "P-" én "01" erin. Zoekbalk leegmaken toont weer alles.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Maakt het uit of ik op Sluiten klik of op het kruisje?"</div>
+<div class="body"><p>Nee, beide sluiten alleen het venster. De wijzigingen zijn op dat moment al in het model gedaan; het rapport verschijnt in beide gevallen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De tekeningenlijst op mijn sheet verandert niet mee."</div>
+<div class="body"><p>Controleer of die lijst een <strong>sheet list-schedule</strong> is die op "Appears In Sheet List" filtert — dat is de eigenschap die dit script schakelt. Een handgemaakte lijst (getekende tabel of legend) verandert uiteraard niet mee.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik de lijstweergave aanpassen, of het venster?"</div>
+<div class="body"><p>De regelopbouw (nummer_naam) staat als <code>LIST_FORMAT</code> in het CONFIG-blok. Teksten, kleuren en afmetingen van het venster staan in <code>UI.xaml</code> — aanpasbaar zonder Python te raken, zolang je <code>x:Name</code>- en event-namen ongemoeid laat (zie het Let&nbsp;op-kader in hoofdstuk&nbsp;02).</p></div>
+</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>Wat is er nieuw in v1.2</h2></div><span class="flens"></span></div>
+
+<p>De werking die je kent — venster, zoekbalk, live schakelen — is ongewijzigd. v1.2 bouwt bewust dóór op de bewezen v1.0-basis (zelfde imports, zelfde vensterflow, zelfde transactievorm per klik) en voegt daar chirurgisch de huisstijl-onderdelen aan toe:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0</th><th>v1.2</th></tr>
+<tr><td>Reeks ongebruikte imports (<code>select_views</code>, <code>Application</code>, <code>Uri</code>, <code>List</code>)</td><td>Ongebruikte imports verwijderd; de bewezen importbasis van v1.0 is verder bewust intact gelaten</td></tr>
+<tr><td>Dode, uitgecommentarieerde regels in de klik-afhandeling</td><td>Dode code verwijderd; de bewezen transactievorm per klik is behouden (elke klik blijft één Ctrl+Z-stap)</td></tr>
+<tr><td>Geen enkel overzicht van wat er gewijzigd is</td><td>Rapport na sluiten: netto zichtbaar gemaakt / verborgen, met doorklikbare sheets</td></tr>
+<tr><td>Eén onleesbare sheet kon het vullen van de lijst breken — zonder melding</td><td>Per-sheet try/except mét teller: het rapport meldt hoeveel sheets niet getoond konden worden</td></tr>
+<tr><td>XAML met design-placeholder ("Sheet - A"), Engels/emoji-label en knop "Submit!"</td><td>XAML opgeschoond: placeholder weg, "Zoeken:" en "Sluiten", kleuren en logo ongewijzigd</td></tr>
+<tr><td>Vaste regelopbouw in de code</td><td><code>LIST_FORMAT</code> in het CONFIG-blok</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Het venster overleeft een kapotte sheet, elke wijziging is per stuk terug te draaien, en na afloop ligt er een controleerbaar rapport — daarmee voldoet ook deze WPF-knop aan de huisstijl.</p>
+</div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · SheetList — Tekeningenlijst · IDG-UITL-SHTL v1.2 · hoort bij SheetList v1.2</span>
+  <span>© 2026 Bram de Jong — privé ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

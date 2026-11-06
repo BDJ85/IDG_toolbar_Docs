@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDG Toolbar — De vier Tag-knoppen</title>
+<meta name="description" content="Handleiding voor Tag Ducts, Tag Air Terminals, Tag Duct Fittings en Tag Rooms (v1.1): werking, tagfamilies, instellingen en veelgestelde vragen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne handleiding</span>
+  <h1>De vier Tag-knoppen</h1>
+  <p class="sub">Eén handleiding voor Tag Ducts, Tag Air Terminals, Tag Duct Fittings en Tag Rooms: wat elke knop tagt, met welke tagfamilie, hoe de gedeelde werking in elkaar zit — en de antwoorden op de vragen uit de tekenkamer.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-TAGS</b></span>
+    <span>Versie <b>1.1</b></span>
+    <span>Hoort bij <b>Tag-scripts v1.1</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>De vier knoppen in één oogopslag</h2></div><span class="flens"></span></div>
+
+<p>Alle vier de knoppen doen hetzelfde soort werk: views selecteren, de juiste elementen vinden, en per element automatisch een tag plaatsen met de juiste IDG-tagfamilie. Wat er getagd wordt en waarmee, verschilt per knop:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th>Knop</th><th>Wat wordt getagd</th><th>Tagfamilie</th><th>In welke views</th></tr>
+<tr><td><strong>Tag Ducts</strong></td><td>Kanalen &gt; 1200&nbsp;mm, niet verticaal</td><td><code>57_IDG_afmeting ro</code> (rond) / <code>57_IDG_afmeting rh</code> (rechthoekig), type&nbsp;1.8&nbsp;mm</td><td>Plattegronden</td></tr>
+<tr><td><strong>Tag Air Terminals</strong></td><td>Alle Air Terminals; dakkappen krijgen een eigen tag</td><td><code>57_IDG_rooster_flow</code> (1.8&nbsp;mm) / <code>57_IDG_Dakkap TAG</code> (RAL kleur)</td><td>Plattegronden + plafondplattegronden</td></tr>
+<tr><td><strong>Tag Duct Fittings</strong></td><td>Fittings uit de instort-reeks (<code>NLRS_57_DUF_UN_*</code>)</td><td><code>57_IDG_O-B_instort</code></td><td>Plattegronden</td></tr>
+<tr><td><strong>Tag Rooms</strong></td><td>Alle rooms — óók uit gelinkte modellen</td><td>Standaard roomtag van het project</td><td>Plattegronden + doorsnedes</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Alle vier de knoppen controleren of een element <strong>al een tag heeft</strong> in de betreffende view en slaan het dan over. Twee keer draaien levert dus geen dubbele tags op; het rapport toont hoeveel er is overgeslagen.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Gemeenschappelijke werking</h2></div><span class="flens"></span></div>
+
+<p>De algemene basis (variabelen, CONFIG, try/except, lambda) staat in <strong>IDG-UITL-OPST</strong>; de v1.1-mechanieken (context-managertransactie, cancel-checks) in <strong>IDG-UITL-CVAD</strong>. Elke tag-knop volgt hetzelfde stramien:</p>
+
+<h3>2.1 De stappen</h3>
+<ol>
+<li><strong>Views kiezen</strong> — keuzelijst met de geschikte viewtypes, gesorteerd op naam. Staat je <strong>actieve view</strong> ertussen, dan staat die bovenaan als "[Huidige view] …". Annuleren = netjes stoppen, zonder wijziging.</li>
+<li><strong>Tagfamilie opzoeken</strong> — het script zoekt de tagfamilie(s) uit het CONFIG-blok, met voorkeur voor het juiste type (bijv. "1.8&nbsp;mm"); bestaat dat type niet, dan het eerste beschikbare type van die familie. Ontbreekt de familie helemaal, dan stopt het script met een duidelijke melding.</li>
+<li><strong>Elementen verzamelen en filteren</strong> — per view worden de elementen van de juiste categorie opgehaald en gefilterd op de knop-specifieke criteria (hoofdstukken 03–06).</li>
+<li><strong>Duplicaatcontrole</strong> — per view wordt eerst één set opgebouwd van element-Id's die al een tag hebben; elementen in die set worden overgeslagen.</li>
+<li><strong>Taggen</strong> — binnen één transactie, met per element een eigen try/except: één kapot element stopt de batch niet.</li>
+<li><strong>Rapporteren</strong> — aantallen (aangemaakt, overgeslagen, uitgesloten, fouten) in het output-paneel; fouten met doorklikbare element-links.</li>
+</ol>
+
+<h3>2.2 Hoe komt een tag op zijn plek?</h3>
+<p>De knoppen voor kanalen, roosters en fittings gebruiken <code>IndependentTag.Create(...)</code>: één Revit-API-aanroep die de tag maakt, aan het element koppelt en een <strong>leader</strong> (aanwijslijntje) geeft. De tagpositie is de elementlocatie plus een vaste offset in millimeters uit het CONFIG-blok — loodrecht op het kanaal (400&nbsp;mm), rechts van het rooster (300&nbsp;mm) of boven de fitting (100&nbsp;mm). Tag Rooms gebruikt de room-specifieke aanroep <code>NewRoomTag(...)</code> (hoofdstuk&nbsp;06).</p>
+
+<div class="kader k-tip"><span class="lb">Alles is achteraf verplaatsbaar</span>
+<p>De offsets zijn een nette startpositie, geen eindstand. Elke tag is een gewoon Revit-element dat je daarna vrij kunt verslepen; de leader blijft aan het element vastzitten.</p>
+</div>
+
+<h3>2.3 De duplicaatcontrole, iets preciezer</h3>
+<p>Per view verzamelt het script alle bestaande tags van de juiste categorie en leest per tag af naar welk element hij wijst — via de nieuwere API-methode (<code>GetTaggedElementIds</code>, Revit&nbsp;2022+) met een terugval voor oudere versies. Kan een enkele tag niet gelezen worden, dan wordt die genegeerd: liever heel af en toe één dubbele tag dan een crash halverwege.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Tag Ducts</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>MIN_LENGTH_MM</code></td><td>1200 — kortere kanalen krijgen geen tag (te druk beeld).</td></tr>
+<tr><td><code>VERTICAL_ANGLE_DEG</code></td><td>30 — kanalen binnen 30° van verticaal zijn standleidingen en worden uitgesloten.</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>400 — de tag staat 400&nbsp;mm loodrecht náást het kanaal, ter hoogte van het midden.</td></tr>
+<tr><td>Tagfamilies</td><td><code>57_IDG_afmeting ro</code> (rond) en <code>57_IDG_afmeting rh</code> (rechthoekig), voorkeurstype "1.8".</td></tr>
+</table></div>
+
+<p><strong>Rond of rechthoekig?</strong> Het script kijkt naar de parameter <code>Diameter</code>: heeft het kanaal een diameter groter dan nul, dan is het rond en krijgt het de ro-tag; anders de rh-tag. <strong>Verticaal of niet?</strong> Van de middellijn van het kanaal wordt de hoek met de verticale as berekend (een stukje meetkunde met <code>math.acos</code>); binnen 30° telt als standleiding.</p>
+
+<div class="kader k-tip"><span class="lb">Waarom standleidingen uitsluiten?</span>
+<p>Een verticaal kanaal is in een plattegrond maar een klein rondje — een afmetingstag met leader erbij vervuilt de tekening en de maat zegt daar weinig. Standleidingen krijgen hun informatie via de doorsnedes.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Tag Air Terminals</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td>Standaardtag</td><td><code>57_IDG_rooster_flow</code>, voorkeurstype "1.8&nbsp;mm".</td></tr>
+<tr><td>Dakkap-detectie</td><td>Familienaam bevat <code>57_RBV_Project dakkap met aanzuig</code> → tagfamilie <code>57_IDG_Dakkap TAG</code>, voorkeurstype "RAL kleur".</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>300 — de tag staat 300&nbsp;mm rechts van het element.</td></tr>
+<tr><td>Views</td><td>Plattegronden én plafondplattegronden (roosters zitten vaak in het plafond).</td></tr>
+</table></div>
+
+<p>Per element bepaalt het script eerst of het een <strong>dakkap</strong> is (op familienaam) en kiest dan de bijbehorende tag. Is de dakkap-tagfamilie niet geladen, dan stopt het script niet: dakkappen krijgen dan de standaardtag en het rapport meldt dit onderaan als "Let op".</p>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>Tag Duct Fittings</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>TARGET_FAMILY_PREFIXES</code></td><td><code>NLRS_57_DUF_UN_eindstuk</code>, <code>…_instort traphoek</code>, <code>…_instortpot</code>, <code>…_tussenstuk</code> — alléén deze instort-families worden getagd.</td></tr>
+<tr><td>Tagfamilie</td><td><code>57_IDG_O-B_instort</code> (gezocht op naam, hoofdletterongevoelig).</td></tr>
+<tr><td><code>TAG_OFFSET_MM</code></td><td>100 — de tag staat 100&nbsp;mm boven het element.</td></tr>
+</table></div>
+
+<p>Het rapport toont per run hoeveel fittings er in totaal gevonden zijn en hoeveel daarvan <strong>passend</strong> waren (familienaam bevat één van de prefixen). Zo zie je meteen of een lage telling komt door de view-inhoud of door de filterlijst. Nieuwe instort-familie in gebruik? Voeg de prefix toe aan <code>TARGET_FAMILY_PREFIXES</code> in het CONFIG-blok — één regel, geen programmeerwerk.</p>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section class="hfd" id="h6">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">06</span><h2>Tag Rooms</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Instelling (CONFIG)</th><th>Waarde</th></tr>
+<tr><td><code>INCLUDE_LINKS</code></td><td>Aan — ook rooms uit gelinkte modellen worden getagd. Handig omdat de rooms bij ons meestal in het bouwkundige (gelinkte) model zitten.</td></tr>
+<tr><td>Views</td><td>Plattegronden én doorsnedes. In een doorsnede wordt de tag naar <strong>halve ruimtehoogte</strong> verplaatst, zodat hij midden in de ruimte hangt.</td></tr>
+</table></div>
+
+<p>Dit script wijkt op twee punten af van de andere drie. Ten eerste gebruikt het niet <code>IndependentTag.Create</code> maar de room-specifieke aanroep <code>NewRoomTag(...)</code>, die een <code>LinkElementId</code> verwacht: voor een eigen room alleen het room-Id, voor een gelinkte room het link-Id én het room-Id samen — zo weet Revit in wélk model de room woont. Ten tweede berekent het zelf het middelpunt: het locatiepunt van de room, op halve hoogte tussen onder- en bovengrens (heeft een room geen bovengrens, dan gewoon het locatiepunt).</p>
+
+<div class="kader k-tip"><span class="lb">Room niet getagd?</span>
+<p>Rooms zonder locatiepunt (niet-geplaatste of "redundant" rooms) kunnen geen tag krijgen en verschijnen in het rapport onder "Geen middelpunt bepaald". Dat is een signaal om die rooms in het (gelinkte) model op te ruimen.</p>
+</div>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section class="hfd" id="h7">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">07</span><h2>Vragen uit de tekenkamer — met antwoord</h2></div><span class="flens"></span></div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide een tag-knop twee keer — nu dubbele tags?"</div>
+<div class="body"><p>Nee. Elk script controleert per view welke elementen al een tag hebben en slaat die over; het rapport telt ze onder "Al getagd, overgeslagen". Handmatig geplaatste tags tellen daarbij gewoon mee.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom krijgt dit korte kanaal geen tag?"</div>
+<div class="body"><p>Tag Ducts tagt alleen kanalen langer dan 1200&nbsp;mm; kortere stukken en standleidingen (binnen 30° van verticaal) worden bewust overgeslagen — het rapport telt de uitgesloten verticale kanalen. Andere grens nodig? Pas <code>MIN_LENGTH_MM</code> aan in het CONFIG-blok.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Melding: tagfamilie niet gevonden."</div>
+<div class="body"><p>De tagfamilie uit het CONFIG-blok is niet in dit project geladen (of heet nét anders). Laad de familie via Insert&nbsp;→ Load&nbsp;Family en draai opnieuw. Alleen bij de dakkap-tag gaat het script zónder verder (dakkappen krijgen dan de standaardtag).</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De tags staan niet allemaal even mooi — kan dat beter?"</div>
+<div class="body"><p>De scripts plaatsen tags op een vaste, voorspelbare offset; bij drukke tekeningen kunnen tags elkaar raken. Versleep ze gewoon — de leader blijft aan het element hangen. De offset structureel anders? Eén regel in het CONFIG-blok (<code>TAG_OFFSET_MM</code>).</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Een fitting uit een nieuwe familie wordt niet getagd."</div>
+<div class="body"><p>Tag Duct Fittings tagt alleen families waarvan de naam één van de prefixen uit <code>TARGET_FAMILY_PREFIXES</code> bevat. Nieuwe familie? Prefix toevoegen in het CONFIG-blok en opnieuw draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Tag Rooms tagt niets, terwijl er wel ruimtes zijn."</div>
+<div class="body"><p>Waarschijnlijk zitten de rooms in een gelinkt model dat niet geladen is (link "Unloaded"), of zijn de rooms niet geplaatst. Controleer de link in Manage&nbsp;Links en het rapport onder "Geen middelpunt bepaald".</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Eén element gaf een fout — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Elk element heeft zijn eigen foutafhandeling: de rest is gewoon getagd en de fout staat met doorklikbare element-link in het rapport. Oorzaak oplossen, opnieuw draaien — al getagde elementen worden overgeslagen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat gebeurt er als ik op Annuleren klik?"</div>
+<div class="body"><p>Het script stopt netjes, zonder foutmelding en zonder iets in het model te wijzigen.</p></div>
+</div>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section class="hfd" id="h8">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">08</span><h2>Wat is er nieuw in v1.1</h2></div><span class="flens"></span></div>
+
+<p>Alle vier de scripts zijn naar de huisstijl van de nieuwere toolbar-scripts gebracht. De tagfamilies, filters en offsets zijn <strong>ongewijzigd</strong> — het gedrag dat je kent blijft hetzelfde. Wat er onder de motorkap veranderde:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">v1.0 (2024/2025)</th><th>v1.1 (2026)</th></tr>
+<tr><td>Losse waarden (1200, 400, familienamen) verspreid door de code</td><td>Alles in één CONFIG-blok per script — aanpasbaar zonder programmeren</td></tr>
+<tr><td><code>import *</code> en drievoudige tag-aanmaak-pogingen voor oeroude Revit-versies</td><td>Expliciete imports en één moderne <code>IndependentTag.Create</code>-aanroep (Revit&nbsp;2022+)</td></tr>
+<tr><td>Voortgang en meldingen verspreid dóór de verwerking heen</td><td>Eén gebundeld rapport aan het einde, met doorklikbare fout-links</td></tr>
+<tr><td>Ducts: geen duplicaatcontrole (tweede run = dubbele tags)</td><td>Alle vier: duplicaatcontrole via één snelle set per view</td></tr>
+<tr><td>Duct Fittings: <code>forms.alert</code> werd overschreven, waardoor de debug-vraag altijd "nee" opleverde en meldingen wegvielen</td><td>Override en debug-popup verwijderd; meldingen werken weer gewoon</td></tr>
+<tr><td>Rooms: álle views tegelijk, zonder selectie; één kapotte room kon de hele run stoppen; rapportregels verschenen vóór de uitvoering</td><td>Rooms: view-selectie zoals de andere knoppen, try/except per room, duplicaatcontrole, rapport ná afloop</td></tr>
+<tr><td>Engels en Nederlands door elkaar; emoji in de rapportage</td><td>Nederlandse gebruikersteksten, sobere rapportage conform huisstijl</td></tr>
+</table></div>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl. Alle vier voldoen in v1.1.</p>
+</div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · De vier Tag-knoppen · IDG-UITL-TAGS v1.1 · hoort bij Tag-scripts v1.1</span>
+  <span>© 2026 Bram de Jong — privé ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

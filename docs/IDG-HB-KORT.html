@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BDJ Toolbar — Beknopt pyRevit-handboek</title>
+<meta name="description" content="Beknopte handleiding: mappenstructuur, script-anatomie en oefeningen voor de BDJ pyRevit-toolbar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">BDJ Toolbar · interne handleiding</span>
+  <h1>Beknopt pyRevit-handboek</h1>
+  <p class="sub">Alles wat je nodig hebt om de toolbar te installeren, de opbouw te begrijpen en zelf een eerste knop te bouwen volgens de juiste conventies. Dit is de <strong>beknopte</strong> versie: structuur en werkwijze — niet de broncode van de toolbar-tools zelf.</p>
+  <div class="specs">
+    <span>Document <b>BDJ-HB-KORT</b></span>
+    <span>Versie <b>1.0</b></span>
+    <span>Revit <b>2022+</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong (BDJ)</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Wat is pyRevit — en wat is deze toolbar?</h2></div><span class="flens"></span></div>
+
+<p><strong>pyRevit</strong> is een gratis uitbreiding op Revit waarmee scripts als gewone ribbon-knoppen beschikbaar komen. Elke knop in de toolbar is een klein Python-script dat via de Revit&nbsp;API met het geopende model praat: elementen verzamelen, parameters lezen of schrijven, views en sheets aanmaken.</p>
+<p>De <strong>BDJ Toolbar</strong> bundelt de scripts die het repeterende tekenkamerwerk overnemen — taggen, opschonen, views en sheets opzetten. Deze handleiding legt uit hoe de toolbar in elkaar zit en hoe je er zelf, veilig, een knop aan toevoegt.</p>
+
+<div class="kader k-tip"><span class="lb">Goed om te weten</span>
+<p>pyRevit draait scripts standaard in <strong>IronPython 2.7</strong>. Dat is een ouder Python-dialect: moderne <code>f"..."</code>-strings werken er níet, en het delen van twee gehele getallen rondt af naar beneden. In hoofdstuk 07 staan de valkuilen op een rij.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Installatie &amp; de toolbar koppelen</h2></div><span class="flens"></span></div>
+
+<h3>2.1 pyRevit installeren</h3>
+<ol>
+<li>Download de nieuwste installer van <a href="https://github.com/pyrevitlabs/pyRevit/releases">github.com/pyrevitlabs/pyRevit/releases</a> en installeer met de standaardinstellingen.</li>
+<li>Start Revit opnieuw. Er verschijnt een tabblad <strong>pyRevit</strong> in de ribbon.</li>
+</ol>
+
+<h3>2.2 De toolbar-extensie koppelen</h3>
+<ol>
+<li>Zorg dat je de map van de toolbar-extensie hebt (de map die eindigt op <code>.extension</code>), lokaal of op de netwerkschijf.</li>
+<li>Ga naar <strong>pyRevit&nbsp;→ Settings&nbsp;→ Custom&nbsp;Extension&nbsp;Directories</strong>, voeg de map toe die de <code>.extension</code>-map <em>bevat</em> en klik <strong>Save&nbsp;Settings&nbsp;+&nbsp;Reload</strong>.</li>
+<li>Het toolbar-tabblad verschijnt in de ribbon. Zie je het niet: controleer of je de bovenliggende map hebt gekozen, niet de <code>.extension</code>-map zelf.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Reload = F5 van pyRevit</span>
+<p>Na élke wijziging aan een script of mapnaam: <strong>pyRevit&nbsp;→ Reload</strong>. Revit hoeft niet opnieuw op te starten — reload duurt een paar seconden en je wijziging is actief.</p>
+</div>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Mappenstructuur: mappen wórden knoppen</h2></div><span class="flens"></span></div>
+
+<p>pyRevit bouwt de ribbon rechtstreeks uit de mappenstructuur op schijf. De naam van de map bepaalt de tekst in Revit; de extensie van de mapnaam bepaalt het type. Zo ziet de opbouw eruit:</p>
+
+<div class="tree"><b>MijnToolbar.extension/</b>
+└── <b>MijnToolbar.tab/</b>                <i>← het tabblad in de ribbon</i>
+    ├── <b>01_Views.panel/</b>             <i>← een paneel (groep) op het tabblad</i>
+    │   ├── <b>MijnKnop.pushbutton/</b>    <i>← één knop</i>
+    │   │   ├── script.py             <i>← de code (verplicht)</i>
+    │   │   ├── icon.png              <i>← 32×32 px (aanbevolen)</i>
+    │   │   └── bundle.yaml           <i>← extra opties (optioneel)</i>
+    │   └── <b>Gereedschap.pulldown/</b>   <i>← uitklapmenu met knoppen erin</i>
+    │       ├── ToolA.pushbutton/
+    │       └── ToolB.pushbutton/
+    └── <b>02_Handleiding.panel/</b>
+        └── <b>Handboek.urlbutton/</b>     <i>← knop die een link/bestand opent</i>
+            └── bundle.yaml</div>
+
+<h3>3.1 De bundeltypes die wij gebruiken</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:26%">Mapextensie</th><th>Wat het oplevert</th></tr>
+<tr><td><code>.pushbutton</code></td><td>Een gewone knop die <code>script.py</code> uitvoert. Het werkpaard van de toolbar.</td></tr>
+<tr><td><code>.pulldown</code></td><td>Een uitklapmenu; de <code>.pushbutton</code>-mappen erbínnen worden de menu-items (zo zijn de Tags- en Purge-menu's gebouwd).</td></tr>
+<tr><td><code>.urlbutton</code></td><td>Een knop die een URL of document opent — bijvoorbeeld deze handleiding. Alleen een <code>bundle.yaml</code> met een <code>hyperlink:</code>-regel nodig.</td></tr>
+<tr><td><code>.smartbutton</code></td><td>Een knop die zijn eigen icoon/status kan bijwerken op basis van het model (zoals de sections-toggle met drie standen).</td></tr>
+<tr><td><code>.stack</code></td><td>Stapelt 2–3 knoppen verticaal binnen een paneel om ruimte te besparen.</td></tr>
+</table></div>
+
+<h3>3.2 Naamgeving</h3>
+<ul>
+<li>Panelen krijgen een <strong>nummerprefix</strong> (<code>01_</code>, <code>02_</code>&nbsp;…) — pyRevit sorteert alfabetisch, dus zo bepaal je de volgorde in de ribbon.</li>
+<li>Knopmappen krijgen de <strong>Nederlandse knoptekst</strong> als naam; een <code>\n</code> in <code>__title__</code> breekt de tekst op de knop af over twee regels.</li>
+<li>Bestandsnamen en code: Engels. Teksten die de gebruiker ziet: Nederlands.</li>
+</ul>
+
+<div class="kader k-let"><span class="lb">Let op</span>
+<p>Hernoem of verplaats je een map, doe dan altijd een <strong>Reload</strong> en controleer of de knop nog werkt — een typfout in <code>.pushbutton</code> of een ontbrekende <code>script.py</code> laat de knop stilletjes uit de ribbon verdwijnen.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Anatomie van een script — het vaste sjabloon</h2></div><span class="flens"></span></div>
+
+<p>Elk script in de toolbar volgt hetzelfde stramien, van boven naar beneden: <strong>header → imports → variabelen → config → main → rapportage</strong>. Wie één script kan lezen, kan ze daardoor allemaal lezen. Dit is het volledige, generieke sjabloon:</p>
+
+<figure class="code"><figcaption>script.py — het standaard-stramien<span>python · IronPython 2.7</span></figcaption>
+<pre><code class="lang-py"># -*- coding: utf-8 -*-
+__title__   = "Knopnaam"
+__author__  = "Bram de Jong"
+__version__ = "1.0"
+__doc__     = """Version: 1.0
+Date:    14 juli 2026
+Author:  Bram de Jong (BDJ)
+__________________________________________________________
+Description:
+[NL] Korte omschrijving van wat het script doet.
+__________________________________________________________
+How-to:
+-> Stap 1
+-> Stap 2
+__________________________________________________________
+"""
+
+# IMPORTS
+# ==================================================
+import clr
+clr.AddReference('RevitAPI')
+clr.AddReference('RevitAPIUI')
+
+from Autodesk.Revit.DB import *
+from pyrevit import revit, forms, script
+
+# VARIABLES
+# ==================================================
+doc    = revit.doc
+uidoc  = revit.uidoc
+output = script.get_output()
+
+# CONFIG  (benoemde constanten - nooit losse getallen in de logica)
+# ==================================================
+SOME_LIMIT_MM = 1200
+
+# MAIN
+# ==================================================
+elements = FilteredElementCollector(doc)\
+           .OfCategory(BuiltInCategory.OST_DuctCurves)\
+           .WhereElementIsNotElementType().ToElements()
+
+if not elements:
+    forms.alert("Niets gevonden.", exitscript=True)
+
+changed, errors = 0, []
+
+# context manager -> automatische rollback bij een fout
+with revit.Transaction("Omschrijving van de actie"):
+    for el in elements:
+        try:
+            # ... hier de bewerking per element ...
+            changed += 1
+        except Exception as e:
+            errors.append((el.Id, str(e)))
+
+# REPORT
+# ==================================================
+output.print_md("## Resultaat")
+output.print_md("- Aangepast: **{}**".format(changed))
+output.print_md("- Fouten: {}".format(len(errors)))
+for eid, msg in errors:
+    output.print_md("- {} -> {}".format(output.linkify(eid), msg))</code></pre></figure>
+
+<h3>4.1 Waarom elk blok er staat</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:22%">Blok</th><th>Functie</th></tr>
+<tr><td><strong>Header</strong></td><td><code>__title__</code> wordt de knoptekst, <code>__doc__</code> de tooltip. De eerste regel (<code>utf-8</code>) is verplicht zodra er een é of ë in je teksten staat.</td></tr>
+<tr><td><strong>Imports</strong></td><td>Vast blok: Revit&nbsp;API via <code>clr</code>, en <code>revit</code>, <code>forms</code>, <code>script</code> uit pyRevit. Geen Dynamo-referenties (<code>RevitServices</code>) — die horen hier niet.</td></tr>
+<tr><td><strong>Variables</strong></td><td><code>doc</code>, <code>uidoc</code> en <code>output</code> altijd bovenaan, zodat elk script dezelfde ingangen heeft.</td></tr>
+<tr><td><strong>Config</strong></td><td>Alle grenswaarden en namen als benoemde constante. Aanpassen kan dan zonder in de logica te graven.</td></tr>
+<tr><td><strong>Main</strong></td><td>Verzamelen → controleren → wijzigen. Wijzigen gebeurt <em>altijd</em> binnen <code>with revit.Transaction("..."):</code>.</td></tr>
+<tr><td><strong>Report</strong></td><td>Resultaten naar het output-paneel met <code>output.print_md</code>; pop-ups alleen voor echte fouten of bevestigingen.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>De vijf gouden regels</h2></div><span class="flens"></span></div>
+
+<p>Het doel achter alle conventies is één ding: <strong>een script mag Revit nooit laten vastlopen</strong> bij een collega. Deze vijf regels borgen dat:</p>
+
+<ol>
+<li><strong>Wijzigen alléén via de context manager</strong> — <code>with revit.Transaction("Nederlandse omschrijving"):</code>. Gaat er iets mis, dan rolt Revit automatisch terug in plaats van in een open transactie te blijven hangen.</li>
+<li><strong>Per element <code>try/except Exception as e:</code></strong> in elke loop met een risicovolle actie. Eén kapot element mag nooit de hele batch afbreken; verzamel fouten en rapporteer ze.</li>
+<li><strong>Cancel-check na elke keuzelijst.</strong> Klikt iemand op Annuleren, dan geeft <code>forms.SelectFromList.show(...)</code> <code>None</code> terug — controleer daarop en stop netjes met <code>script.exit()</code>.</li>
+<li><strong>Rapportage via <code>output.print_md</code></strong>, niet via een pop-up per actie. Eén overzicht aan het einde, met <code>output.linkify(element_id)</code> zodat je naar elementen kunt doorklikken.</li>
+<li><strong>Benoemde constanten in het CONFIG-blok</strong> — geen magische getallen of familienamen verstopt in de logica.</li>
+</ol>
+
+<div class="kader k-ok"><span class="lb">Zo herken je goed werk</span>
+<p>Draait een script twee keer achter elkaar zonder dubbele resultaten, meldt het netjes wat het heeft overgeslagen, en overleeft het een klik op Annuleren — dan voldoet het aan de huisstijl.</p>
+</div>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section class="hfd" id="h6">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">06</span><h2>Oefeningen</h2></div><span class="flens"></span></div>
+
+<p>Drie opdrachten, oplopend in moeilijkheid. Werk in een eigen oefen-extensie (hoofdstuk 03) en test op een <strong>kopie</strong> van een project — nooit op het echte model.</p>
+
+<div class="oefening">
+<div class="kop">Oefening 1 — Je eerste eigen knop</div>
+<div class="body">
+<p>Maak in je oefen-extensie de map <code>HalloTekenkamer.pushbutton</code> met een <code>script.py</code> die het volledige header-blok uit hoofdstuk 04 heeft en één melding toont:</p>
+<figure class="code"><figcaption>de kern van het script<span>python</span></figcaption>
+<pre><code class="lang-py">from pyrevit import forms
+forms.alert("Hallo tekenkamer! Dit is mijn eerste knop.")</code></pre></figure>
+<p>Doe een <strong>Reload</strong> en controleer: staat de knop in de ribbon, en toont de tooltip jouw <code>__doc__</code>?</p>
+</div>
+</div>
+
+<div class="oefening">
+<div class="kop">Oefening 2 — In welk model werk ik?</div>
+<div class="body">
+<p>Maak een tweede knop die de naam van het geopende model toont:</p>
+<figure class="code"><figcaption>alleen-lezen: hier kan niets kapot<span>python</span></figcaption>
+<pre><code class="lang-py">from pyrevit import revit, forms
+
+doc = revit.doc
+forms.alert("Je werkt nu in: {}".format(doc.Title))</code></pre></figure>
+<p><strong>Bonus:</strong> vervang <code>doc.Title</code> eens door <code>doc.PathName</code> en bekijk het verschil.</p>
+</div>
+</div>
+
+<div class="oefening">
+<div class="kop">Oefening 3 — Kanalen tellen in de actieve view</div>
+<div class="body">
+<p>Bouw een knop die telt hoeveel ducts er in de actieve view zichtbaar zijn en het resultaat in het output-paneel zet:</p>
+<figure class="code"><figcaption>collector + rapportage — nog steeds alleen-lezen<span>python</span></figcaption>
+<pre><code class="lang-py">from Autodesk.Revit.DB import FilteredElementCollector, BuiltInCategory
+from pyrevit import revit, script
+
+doc    = revit.doc
+output = script.get_output()
+
+ducts = FilteredElementCollector(doc, doc.ActiveView.Id)\
+        .OfCategory(BuiltInCategory.OST_DuctCurves)\
+        .WhereElementIsNotElementType().ToElements()
+
+output.print_md("## Telling actieve view")
+output.print_md("- Ducts gevonden: **{}**".format(len(ducts)))</code></pre></figure>
+<p><strong>Bonus:</strong> tel óók de duct fittings (<code>OST_DuctFitting</code>) en zet beide tellingen in het rapport. Dit is precies het lees-en-rapporteer-patroon waarop de meeste toolbar-knoppen zijn gebouwd.</p>
+</div>
+</div>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section class="hfd" id="h7">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">07</span><h2>Problemen oplossen</h2></div><span class="flens"></span></div>
+
+<h3>7.1 De knop verschijnt niet</h3>
+<ul class="checklist">
+<li>Mapnaam eindigt exact op <code>.pushbutton</code> (of ander geldig type) en bevat een <code>script.py</code>.</li>
+<li>De bovenliggende structuur klopt: <code>.extension → .tab → .panel → .pushbutton</code>.</li>
+<li>Je hebt <strong>pyRevit&nbsp;→ Reload</strong> gedaan na de wijziging.</li>
+</ul>
+
+<h3>7.2 Rode foutmelding (traceback)</h3>
+<p>Lees een traceback altijd <strong>van onder naar boven</strong>: de onderste regel zegt <em>wat</em> er misging, de regels erboven <em>waar</em>. De drie IronPython&nbsp;2.7-klassiekers:</p>
+<div class="tbl-wrap"><table>
+<tr><th style="width:38%">Symptoom</th><th>Oorzaak &amp; oplossing</th></tr>
+<tr><td><code>SyntaxError</code> op een regel met <code>f"..."</code></td><td>F-strings bestaan niet in IronPython&nbsp;2.7 — herschrijf naar <code>"...{}".format(x)</code>.</td></tr>
+<tr><td>Een deling geeft geruisloos een te laag geheel getal</td><td>Twee gehele getallen delen rondt af naar beneden: <code>1850&nbsp;/&nbsp;1000</code>&nbsp;→&nbsp;<code>1</code>. Maak er één een kommagetal van: <code>/&nbsp;1000.0</code>.</td></tr>
+<tr><td>Rare tekens of een fout bij é/ë in teksten</td><td><code># -*- coding: utf-8 -*-</code> moet de allereerste regel van het script zijn.</td></tr>
+</table></div>
+
+<h3>7.3 "Er gebeurt niets"</h3>
+<p>Controleer het <strong>output-paneel</strong> (verschijnt achter het Revit-venster) — de meeste knoppen rapporteren daar in plaats van met een pop-up. Vindt een script niets om te doen, dan meldt het dat daar ook.</p>
+
+<div class="kader k-let"><span class="lb">Gouden testregel</span>
+<p>Test elke nieuwe of aangepaste knop eerst op een <strong>kopie van een echt project</strong> — niet alleen op een leeg testmodel, en nooit rechtstreeks op productiewerk.</p>
+</div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>BDJ Toolbar · Beknopt pyRevit-handboek · BDJ-HB-KORT v1.0</span>
+  <span>© 2026 Bram de Jong (BDJ)</span>
+</footer>
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

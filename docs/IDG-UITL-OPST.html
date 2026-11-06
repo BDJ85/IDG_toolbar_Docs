@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IDG Toolbar — Uitleg Opstellingen-script</title>
+<meta name="description" content="Uitleg van het Opstellingen-script (v3.1): werking, opbouw, basisbegrippen en veelgestelde vragen — voor de tekenkamer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne handleiding</span>
+  <h1>Uitleg: het Opstellingen-script</h1>
+  <p class="sub">In gewone taal: wat het script doet, hoe het is opgebouwd, waarom het gebouwd is zoals het gebouwd is — en de antwoorden op de vragen die je er waarschijnlijk over hebt. Geschreven voor de tekenkamer, niet voor programmeurs.</p>
+  <div class="specs">
+    <span>Document <b>IDG-UITL-OPST</b></span>
+    <span>Versie <b>1.0</b></span>
+    <span>Hoort bij <b>Opstellingen v3.1</b></span>
+    <span>Engine <b>IronPython 2.7</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Wat doet dit script?</h2></div><span class="flens"></span></div>
+
+<p>Je selecteert in een lijst één of meer Mechanical&nbsp;Equipment-units (bijv. WTW-units) die een <code>IDG_Bouwnummer</code> hebben. Het script maakt daarna per unit automatisch aan wat jij aanvinkt: een <strong>doorsnede</strong> ("Opstelling&nbsp;-&nbsp;&lt;bouwnummer&gt;"), een <strong>plattegrond</strong> ("Plattegrond&nbsp;&lt;bouwnummer&gt;", met view template en exact dezelfde uitsnede als de doorsnede) en/of een <strong>sheet</strong> (titleblock <code>00_IDG_kader</code>, nummering "Opst&nbsp;1, Opst&nbsp;2, …" doorlopend na bestaande nummers, plattegrond links en doorsnede rechtsboven). Wat al bestaat wordt overgeslagen, en aan het eind krijg je een rapport: wat is aangemaakt, wat is overgeslagen, en waar iets misging.</p>
+
+<h3>1.1 De negen stappen van de hoofdroutine</h3>
+<ol>
+<li><strong>Verzamelen</strong> — alle Mechanical Equipment in het model ophalen.</li>
+<li><strong>Selecteren</strong> — keuzelijst: één totaallijst met een "Verdieping"-filter; units mét bouwnummer staan voorgevinkt.</li>
+<li><strong>Outputs kiezen</strong> — doorsnedes, plattegronden, sheets (1, 2 of alle 3).</li>
+<li><strong>Filteren op bouwnummer</strong> — units zonder <code>IDG_Bouwnummer</code> gaan niet mee (wél zichtbaar in het eindrapport).</li>
+<li><strong>Resources ophalen</strong> — alléén wat nodig is: 3D-view (muurdetectie), view-types, template, titleblock. Ontbreekt iets essentieels, dan stopt het script netjes met een melding.</li>
+<li><strong>Groeperen</strong> — units met hetzelfde bouwnummer krijgen een suffix A/B/C, zodat viewnamen uniek blijven.</li>
+<li><strong>Bestaande namen inventariseren</strong> — welke views en sheets bestaan al, en wat is het hoogste bestaande "Opst"-nummer.</li>
+<li><strong>Aanmaken</strong> — alles binnen <strong>één transactie</strong> (zie 2.4): per unit doorsnede, plattegrond en/of sheet.</li>
+<li><strong>Rapporteren</strong> — overzicht in het pyRevit-uitvoervenster: aantallen, sheets, overgeslagen items, fouten.</li>
+</ol>
+
+<div class="kader k-ok"><span class="lb">Veilig om opnieuw te draaien</span>
+<p>Het script is <strong>idempotent</strong>: views en sheets die al bestaan worden overgeslagen (<code>SKIP_EXISTING</code>). Twee keer draaien levert dus nooit dubbele views of sheets op.</p>
+</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Basisbegrippen — de bouwstenen</h2></div><span class="flens"></span></div>
+
+<h3>2.1 Wat is een variabele?</h3>
+<p>Een variabele is een <strong>naam voor een waarde</strong>, zodat je die later kunt hergebruiken. Vergelijk het met een parameter in Revit: <code>IDG_Bouwnummer = "B1-04"</code> in Revit is hetzelfde idee als <code>bouwnr = "B1-04"</code> in Python. Naam links, waarde rechts — en overal waar daarna <code>bouwnr</code> staat, wordt die waarde gebruikt.</p>
+
+<h3>2.2 Wat is een functie?</h3>
+<p>Een functie is een <strong>herbruikbaar blok code met een naam</strong>: je roept hem aan met invoer en krijgt (meestal) een resultaat terug. <code>mm_to_ft(1000.0)</code> betekent: "voer het blok <code>mm_to_ft</code> uit met 1000 als invoer". Functies bestaan om twee redenen: dezelfde logica hoef je maar één keer te schrijven, en de naam documenteert wat er gebeurt. Daardoor lees je <code>main()</code> als een stappenplan in plaats van als 1000 regels brij.</p>
+
+<h3>2.3 Waarom constanten (CONFIG) bovenaan?</h3>
+<p>Bovenin staat een <code>#&nbsp;CONFIG</code>-blok met namen in HOOFDLETTERS: <code>PLAN_TEMPLATE_NAME</code>, <code>TITLEBLOCK_FAMILY</code>, marges in mm, enzovoort. Drie redenen:</p>
+<ol>
+<li><strong>Aanpasbaar zonder programmeerkennis.</strong> Verandert het template of de titleblock ooit, dan pas je één regel bovenin aan — niet zoeken in 1000 regels code. Het CONFIG-blok is het instellingenpaneel van het script.</li>
+<li><strong>Geen "magic numbers".</strong> Een losse <code>50.0</code> midden in de code zegt niemand iets; <code>MARGIN_RIGHT_MM = 50.0</code> mét commentaar ("de IDG-kader heeft de stempel rechtsonder") legt het vast.</li>
+<li><strong>Eén waarheid.</strong> Wordt een waarde op drie plekken gebruikt, dan is er maar één plek waar hij gedefinieerd is.</li>
+</ol>
+<p>De hoofdletters zijn een Python-afspraak: HOOFDLETTERS&nbsp;= "dit is een instelling, wijzig alleen hier".</p>
+
+<h3>2.4 Waarom try en except?</h3>
+<p><code>try</code>/<code>except</code> betekent: "<strong>probeer</strong> dit, en als het misgaat, <strong>vang de fout op</strong> in plaats van te crashen." Het script gebruikt dit op drie manieren:</p>
+<ol>
+<li><strong>Per unit, in de hoofdlus.</strong> Verwerk je 40 units en heeft unit 12 kapotte geometrie, dan stopt zonder try/except het héle script daar — de andere 28 worden nooit gemaakt. Mét try/except wordt de fout genoteerd in de foutenlijst en gaat het script door met unit 13. Aan het eind zie je precies: "38 gelukt, 2 fouten, en dit waren ze."</li>
+<li><strong>Rond onbetrouwbare Revit-eigenschappen</strong> (bijv. <code>s.Family.Name</code>). Sommige elementen geven een fout zodra je een eigenschap opvraagt (corrupte elementen, systeemfamilies, gelinkte content). Het script vangt dat op en gaat verder met een veilige terugvalwaarde.</li>
+<li><strong>Voor versieverschillen.</strong> <code>UnitTypeId</code> bestaat pas vanaf Revit 2021. Het script <em>probeert</em> die te importeren; lukt dat niet, dan valt het terug op het oude <code>DisplayUnitType</code>. Zo draait één script op alle Revit-versies op kantoor.</li>
+</ol>
+<figure class="code"><figcaption>patroon 1 — per element, nooit de batch afbreken<span>python</span></figcaption>
+<pre><code class="lang-py">for unit, bouwnr, suffix in work_items:
+    try:
+        # ... doorsnede / plattegrond / sheet aanmaken ...
+        pass
+    except Exception as ex:
+        errors.append("{}: {}".format(bouwnr, ex))   # noteren, doorgaan</code></pre></figure>
+<p>Belangrijk detail: het script gebruikt altijd <code>except Exception as ex</code> (de fout wordt bewaard en gerapporteerd) en op cruciale plekken nooit een "kale" <code>except:</code> die fouten geruisloos wegslikt.</p>
+
+<div class="kader k-tip"><span class="lb">En de transactie dan?</span>
+<p>Alles wat het script in het model wijzigt, gebeurt binnen <code>with revit.Transaction("Opstellingen aanmaken"):</code>. Dat is het vangnet op <strong>modelniveau</strong>: gaat er iets fundamenteel mis, dan draait Revit álle wijzigingen automatisch terug en blijft het model schoon. Bovendien is het hele resultaat daardoor <strong>één keer Ctrl+Z</strong> in plaats van honderd losse stappen. Try/except vangt de kleine fouten per element; de transactie beschermt het model als geheel.</p>
+</div>
+
+<h3>2.5 Wat is een lambda-functie?</h3>
+<p>Een lambda is een <strong>mini-functie zonder naam, van één regel</strong>, gebruikt op de plek waar je hem nodig hebt. En ja: dit bestaat gewoon in IronPython — het is kern-Python-syntaxis. Dit script bevat er drie, alle drie als sorteersleutel:</p>
+<figure class="code"><figcaption>de drie lambdas in dit script — allemaal sorteersleutels<span>python</span></figcaption>
+<pre><code class="lang-py"># keuzelijst sorteren op label
+groups[k].sort(key=lambda it: it.name)
+
+# units met hetzelfde bouwnummer: vaste volgorde op ElementId
+group_units.sort(key=lambda e: e.Id.IntegerValue)
+
+# het werk sorteren op (bouwnummer, suffix)
+work_items.sort(key=lambda it: (it[1], it[2]))</code></pre></figure>
+<p>Waarom een lambda en geen gewone functie? <code>sort()</code> verwacht als <code>key</code> een functie die zegt <em>waarop</em> gesorteerd moet worden. Voor iets van één regel dat maar op één plek gebruikt wordt, is een aparte functie met <code>def</code> en een naam onnodig omslachtig. <code>lambda e: e.Id.IntegerValue</code> leest als: "gegeven element <code>e</code>, geef het getal van zijn Id terug" — dáárop wordt gesorteerd.</p>
+<div class="kader k-tip"><span class="lb">Waarom sorteren op ElementId?</span>
+<p>Zodat de A/B/C-suffixes <strong>deterministisch</strong> zijn: draai het script morgen opnieuw en dezelfde unit krijgt weer dezelfde letter. Zonder vaste sortering kon de volgorde per run verschillen.</p>
+</div>
+
+<h3>2.6 Wat is Pylint?</h3>
+<p>Pylint is een <strong>controleprogramma voor Python-code</strong> (een "linter"). Het draait je script niet, maar leest de code en waarschuwt voor: ongebruikte variabelen, typefouten in namen (die pas crashen als die regel toevallig uitgevoerd wordt), stijlafwijkingen (PEP&nbsp;8), te lange functies. Vergelijk het met Revit-warnings: het model werkt nog, maar de melding wijst op iets dat je beter kunt oplossen.</p>
+<div class="kader k-let"><span class="lb">Let op bij pyRevit</span>
+<p>Pylint kent <code>Autodesk.Revit.DB</code> en de pyRevit-modules niet en meldt daarom altijd een aantal onterechte "import kan niet gevonden worden"-fouten. Die mag je negeren; de overige waarschuwingen zijn wél waardevol.</p>
+</div>
+
+<h3>2.7 Wat betekent if __name__ == "__main__" onderaan?</h3>
+<p>De standaard-Python-manier om te zeggen: "voer <code>main()</code> alleen uit als dit bestand zélf gestart wordt" — wat pyRevit doet als je op de knop klikt. Zou een ander script dit bestand ooit <em>importeren</em> om een hulpfunctie te hergebruiken, dan start <code>main()</code> niet ongevraagd. De aan/uit-knop van het script.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>Python, IronPython en Dynamo — het verschil</h2></div><span class="flens"></span></div>
+
+<p>Alle drie spreken ze de taal Python, maar het "motorblok" eronder verschilt — en dat bepaalt wat je wel en niet kunt.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Python (CPython)</th><th>IronPython</th><th>Dynamo Python-node</th></tr>
+<tr><td><strong>Wat is het?</strong></td><td>De "gewone" Python van python.org</td><td>Python nagebouwd op Microsofts .NET-platform</td><td>Een Python-blokje <em>binnen</em> een Dynamo-grafiek</td></tr>
+<tr><td><strong>Draait op</strong></td><td>Eigen runtime</td><td>.NET — dezelfde runtime als Revit zelf</td><td>IronPython óf CPython3, gekozen in de node</td></tr>
+<tr><td><strong>Praat met Revit?</strong></td><td>Niet rechtstreeks</td><td><strong>Ja, native</strong> — daarom gebruikt pyRevit het</td><td>Ja, via Dynamo's tussenlaag (wrappers, <code>UnwrapElement</code>, transacties door Dynamo beheerd)</td></tr>
+<tr><td><strong>Versie in ons werk</strong></td><td>3.x (modern)</td><td><strong>2.7</strong> — dit script is dus Python 2.7-stijl</td><td>Wisselend per Dynamo-versie</td></tr>
+<tr><td><strong>Externe pakketten</strong></td><td>Volledig ecosysteem</td><td>Nee (wel alle .NET-bibliotheken)</td><td>Beperkt</td></tr>
+<tr><td><strong>Typisch gebruik</strong></td><td>Losse tools, data</td><td><strong>pyRevit-scripts zoals dit</strong></td><td>Grafiek-experimenten, one-offs</td></tr>
+</table></div>
+
+<h3>3.1 De drie gevolgen die je in dít script terugziet</h3>
+<ol>
+<li><strong>Geen f-strings.</strong> IronPython&nbsp;2.7 kent <code>f"tekst {waarde}"</code> niet; daarom staat overal <code>"tekst {}".format(waarde)</code>. Geen ouderwetse voorkeur — een harde eis van de omgeving.</li>
+<li><strong>Transacties zelf beheren.</strong> In Dynamo regelt Dynamo de transactie; in pyRevit doet het script dat zelf — vandaar het <code>with revit.Transaction(...)</code>-blok.</li>
+<li><strong>Rechtstreekse API-toegang.</strong> <code>from Autodesk.Revit.DB import ...</code> zijn letterlijk dezelfde klassen als in C#. De officiële Revit&nbsp;API-documentatie geldt hier één-op-één, zonder Dynamo-vertaalslag.</li>
+</ol>
+
+<div class="kader k-tip"><span class="lb">Kortom</span>
+<p>Dynamo-Python en pyRevit-Python zijn <strong>dezelfde taal</strong>, maar pyRevit staat dichter op de Revit&nbsp;API — krachtiger én verantwoordelijker: transacties, fouten en versies handel je zelf af. Precies wat dit script overal doet.</p>
+</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Functie-voor-functie referentie</h2></div><span class="flens"></span></div>
+
+<p>Gegroepeerd zoals in het script. Namen met een underscore-prefix (<code>_norm_param_name</code>) zijn "intern": hulpjes voor andere functies, niet bedoeld voor los gebruik.</p>
+
+<h3>4.1 Eenheden</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>mm_to_ft(mm)</code></td><td>Rekent millimeters om naar Revits interne eenheid (decimale voet). <strong>Alle maten in dit script staan in mm</strong>; alleen op het laatste moment wordt omgerekend. Kiest automatisch de moderne (<code>UnitTypeId</code>, Revit&nbsp;2021+) of oude (<code>DisplayUnitType</code>) methode.</td></tr>
+</table></div>
+
+<h3>4.2 Opzoeken (lookups)</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_section_view_family_type</code></td><td>Zoekt het eerste view-type "Section" — nodig om een doorsnede te kúnnen maken.</td></tr>
+<tr><td><code>get_floor_plan_view_family_type</code></td><td>Idem, voor "Floor Plan".</td></tr>
+<tr><td><code>get_view_template_by_name</code></td><td>Zoekt het view template op naam (CONFIG). Bestaat het niet → waarschuwing, maar het script gaat door zonder template.</td></tr>
+<tr><td><code>get_titleblock_symbol</code></td><td>Zoekt de titleblock op familie- én typenaam. Leest de typenaam op twee manieren (parameter én <code>.Name</code>), omdat niet elke versie/familie beide betrouwbaar geeft.</td></tr>
+<tr><td><code>list_titleblocks</code></td><td>Lijst "Familie&nbsp;:&nbsp;Type" van álle geladen titleblocks — alleen gebruikt in de foutmelding, zodat je meteen ziet wat er wél is.</td></tr>
+<tr><td><code>get_level_elevation</code></td><td>Peilhoogte van een level (interne eenheden).</td></tr>
+<tr><td><code>get_unit_level_id</code></td><td>Op welk level staat de unit? Probeert eerst de gewone level-parameter, dan de schedule-level — families verschillen hierin.</td></tr>
+<tr><td><code>get_level_name</code></td><td>Naam van een level, of <code>None</code> — voor de labels in de keuzelijst.</td></tr>
+</table></div>
+
+<h3>4.3 Unit-informatie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>get_unit_center</code></td><td>Middelpunt van de unit via de bounding box; anders het plaatsingspunt. Het anker voor alle geometrie.</td></tr>
+<tr><td><code>get_idg_bouwnummer</code></td><td>Leest <code>IDG_Bouwnummer</code>: eerst op de <strong>instance</strong>, dan op het <strong>type</strong>. Leeg of alleen spaties telt als "geen bouwnummer".</td></tr>
+<tr><td><code>get_unit_type_label</code></td><td>Label "Familie&nbsp;:&nbsp;Type" voor de keuzelijst; "?" als dat niet lukt — in plaats van crashen op één rare family.</td></tr>
+</table></div>
+
+<h3>4.4 Muurdetectie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>find_first_wall_distance</code></td><td>Schiet een onzichtbare "laserstraal" (raycast) vanuit de unit en meet de afstand tot de <strong>eerste muur</strong> — ook in gelinkte modellen. <code>None</code> als er binnen 50&nbsp;m niets geraakt wordt.</td></tr>
+<tr><td><code>get_or_find_3d_view</code></td><td>Raycasten kan alleen vanuit een 3D-view: pakt de eerste bestaande, of maakt er één aan.</td></tr>
+</table></div>
+<div class="kader k-tip"><span class="lb">Waarom muurdetectie?</span>
+<p>De doorsnede en plattegrond moeten precies <strong>van muur tot muur</strong> lopen. Het script meet links en rechts van de unit de afstand tot de dichtstbijzijnde muur (+200&nbsp;mm overschot zodat de muur zelf in beeld is). Geen muur gevonden → terugval op 2000&nbsp;mm.</p>
+</div>
+
+<h3>4.5 Geometrie</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>compute_geometry</code></td><td>Het rekenhart. Bepaalt in één keer, voor doorsnede én plattegrond samen: kijkrichting (uit <code>FacingOrientation</code>, plat geprojecteerd), middelpunt, level, muurafstanden links/rechts — en bouwt daaruit de gedraaide bounding box voor de doorsnede (300&nbsp;mm onder peil tot 4000&nbsp;mm hoog, kijkdiepte 2200&nbsp;mm, camera 1&nbsp;m vóór de unit). De raycasts gebeuren zo maar één keer per unit.</td></tr>
+<tr><td><code>set_plan_crop_shape</code></td><td>Zet op de plattegrond een <strong>gedraaide rechthoekige crop</strong> met exact dezelfde voetafdruk als de doorsnede (muur-tot-muur breed, 1200&nbsp;mm achter tot 1000&nbsp;mm vóór de unit). Gebruikt bewust <code>SetCropShape()</code> met een CurveLoop — een gedraaide CropBox interpreteert Revit bij plan views verkeerd. Probeert beide draairichtingen van de rechthoek.</td></tr>
+<tr><td><code>hide_crop_region</code></td><td>Crop áán, maar de croprand <strong>onzichtbaar</strong> — nette views zonder kaderlijn.</td></tr>
+</table></div>
+
+<h3>4.6 Suffixen en bestaande namen</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>suffix_for_index</code></td><td>0, 1, 2, … → "A", "B", "C", … en na "Z" door naar "AA", "AB" (zoals Excel-kolommen). Voor dubbele bouwnummers.</td></tr>
+<tr><td><code>collect_existing_view_names</code></td><td>Alle bestaande viewnamen (kleine letters — Revit-namen zijn hoofdletterongevoelig): de basis voor <code>SKIP_EXISTING</code>.</td></tr>
+<tr><td><code>collect_existing_sheets</code></td><td>Alle bestaande sheetnamen, plus via een tekstpatroon (regex) het hoogste bestaande "Opst&nbsp;&lt;n&gt;"-nummer — de nieuwe nummering loopt daar netjes op door.</td></tr>
+</table></div>
+
+<h3>4.7 Sheet- en parameterhulpen</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>set_titleblock_text_param</code></td><td>Schrijft (optioneel, CONFIG) het bouwnummer óók naar een tekstparameter op de titleblock-instance. CONFIG leeg → doet niets.</td></tr>
+<tr><td><code>_norm_param_name</code></td><td>Intern: normaliseert een parameternaam (spaties weg, kleine letters), zodat "IDG_sheettype" en "IDG_Sheettype&nbsp;" gelijk zijn.</td></tr>
+<tr><td><code>find_param_fuzzy</code></td><td>Zoekt een parameter eerst exact, anders spatie-/hoofdletterongevoelig. Geeft ook de wérkelijke naam terug voor het rapport.</td></tr>
+<tr><td><code>_set_param_value</code></td><td>Intern: zet een waarde met respect voor het opslagtype (tekst / geheel getal / kommagetal).</td></tr>
+<tr><td><code>_titleblock_on_sheet</code></td><td>Intern: pakt de titleblock-instance op een sheet.</td></tr>
+<tr><td><code>set_sheet_param</code></td><td>De "slimme schrijver": probeert een parameter te zetten op <strong>sheet → titleblock-instance → titleblock-type</strong>, in die volgorde, met fuzzy naam-matching. Geeft een resultaat terug (gelukt / waar / werkelijke naam / reden) voor het eindrapport.</td></tr>
+<tr><td><code>list_sheet_param_names</code></td><td>Diagnose: alle beschikbare parameternamen op sheet + titleblock. Alleen getoond als een parameter níet gezet kon worden — kopieer dan de juiste naam exact in <code>SHEET_PARAMS</code>.</td></tr>
+<tr><td><code>get_titleblock_outline_on_sheet</code></td><td>Buitenmaten van de titleblock op het sheet (met terugvalwaarde), als referentie voor viewport-plaatsing.</td></tr>
+<tr><td><code>place_viewport</code></td><td>Plaatst een viewport: <code>"left"</code> = verticaal gecentreerd links, <code>"topright"</code> = rechtsboven — met de CONFIG-marges, zodat de doorsnede vrij blijft van de stempel rechtsonder.</td></tr>
+</table></div>
+
+<h3>4.8 De keuzelijst (classes)</h3>
+<p>Een <strong>class</strong> is een sjabloon dat gegevens en gedrag bundelt. Deze twee bouwen voort op standaard-pyRevit-onderdelen:</p>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Class</th><th>Wat doet hij</th></tr>
+<tr><td><code>MechItem</code></td><td>Eén regel in de keuzelijst: koppelt een unit aan een rijk label ("bouwnummer&nbsp;|&nbsp;Familie&nbsp;:&nbsp;Type&nbsp;|&nbsp;verdieping") en of hij voorgevinkt is.</td></tr>
+<tr><td><code>MechSelect</code></td><td>Aangepaste <code>SelectFromList</code>. <strong>Waarom:</strong> pyRevit t/m 5.2 geeft bij "Volgende" alleen de vinkjes uit de <em>actieve</em> groep terug — met het Verdieping-filter op "01" verloor je dus stilletjes je vinkjes op andere verdiepingen. Deze override verzamelt de vinkjes uit <strong>alle</strong> groepen (ontdubbeld), op elke pyRevit-versie gelijk. Het filter is daardoor puur een filter. Bij onverwachte problemen valt hij terug op het standaardgedrag.</td></tr>
+</table></div>
+
+<h3>4.9 Aanmaak en hoofdroutine</h3>
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Functie</th><th>Wat doet hij</th></tr>
+<tr><td><code>create_for_unit</code></td><td>De werker: maakt voor <strong>één</strong> unit de gekozen outputs. Berekent de geometrie éénmalig en maakt dan — indien aangevinkt én nog niet bestaand — de doorsnede, de plattegrond (template, crop, verborgen croprand) en het sheet (nummer, naam, parameters, viewports). Elke stap heeft zijn eigen try/except; alles komt terug in één resultaat (aangemaakt / overgeslagen / fouten).</td></tr>
+<tr><td><code>main</code></td><td>De dirigent: voert de negen stappen uit hoofdstuk&nbsp;01 uit en verzamelt alle resultaten voor het eindrapport. Bevat bewust nauwelijks detailwerk — zo lees je <code>main()</code> als een inhoudsopgave.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>Vragen uit de tekenkamer — met antwoord</h2></div><span class="flens"></span></div>
+
+<div class="oefening">
+<div class="kop">"Waarom staat mijn unit niet voorgevinkt?"</div>
+<div class="body"><p>Alleen units mét een ingevulde <code>IDG_Bouwnummer</code> (op instance óf type) staan voorgevinkt. Vul de parameter en draai opnieuw.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Ik draaide het script twee keer — nu dubbele views?"</div>
+<div class="body"><p>Nee. <code>SKIP_EXISTING</code> staat aan: views en sheets die er al zijn (op naam) worden overgeslagen en verschijnen in het rapport onder "Overgeslagen". Het script is veilig om opnieuw te draaien.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Waarom kregen twee views een A en B achter de naam?"</div>
+<div class="body"><p>Twee units hadden hetzelfde bouwnummer. Viewnamen moeten uniek zijn, dus krijgen ze een suffix. De volgorde is vast (gesorteerd op ElementId): morgen hetzelfde als vandaag.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De sheetnummers lopen door na oude sheets — klopt dat?"</div>
+<div class="body"><p>Ja, bewust. Het script zoekt het hoogste bestaande "Opst&nbsp;&lt;n&gt;"-nummer en telt daarvandaan verder — zo ontstaan nooit dubbele sheetnummers.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Melding: view template niet gevonden."</div>
+<div class="body"><p>Dan bestaat <code>57_VL_Luchtinstallatie werktekeningen</code> niet (precies zo gespeld) in dit model. De plattegronden worden dan zónder template gemaakt; het script stopt daar niet op.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"De crop van de plattegrond is niet gezet, zegt het rapport."</div>
+<div class="body"><p>Meestal: het view template zet "Crop&nbsp;View" uit, waardoor het script de crop niet mag aanpassen. Controleer het template — de melding in het rapport zegt dit ook.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Kan ik iets aanpassen zonder te programmeren?"</div>
+<div class="body"><p>Ja — alles in het <code>#&nbsp;CONFIG</code>-blok bovenin: templatenaam, titleblock, prefixen, marges (in mm), extra sheet-parameters. Verder niets aanraken.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"2 units gaven fouten, de rest lukte — moet ik alles overdoen?"</div>
+<div class="body"><p>Nee. Dankzij de try/except-per-unit is de rest gewoon aangemaakt. Los het probleem bij die 2 units op (staat in het foutenrapport) en draai opnieuw: de gelukte units worden automatisch overgeslagen.</p></div>
+</div>
+
+<div class="oefening">
+<div class="kop">"Wat als ik halverwege annuleer, of er gaat iets ernstig mis?"</div>
+<div class="body"><p>Selectievensters annuleren = het script stopt zonder iets te wijzigen. Gaat er tijdens het aanmaken iets fundamenteel mis, dan draait de transactie álle wijzigingen terug — het model blijft zoals het was. En het hele resultaat is achteraf één Ctrl+Z.</p></div>
+</div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · Uitleg Opstellingen-script · IDG-UITL-OPST v1.0 · hoort bij Opstellingen v3.1</span>
+  <span>© 2026 Bram de Jong — privé ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>

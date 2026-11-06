@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iExport — overdracht &amp; vervolgplan (IDG-HO-IEXP)</title>
+<meta name="description" content="Overdrachtsdocument iExport: afgelegde route t/m Fase 1, huidige status en het vervolgplan voor Fase 2 t/m 5 inclusief de C#-port.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BDJ TOOLBAR DOCS — datasheet-stijl (installatietechniek)
+   Bewust géén Academy-huisstijl: dit is interne tooling-docu.
+   Signature: hoofdstukkoppen als kanaalsegment met flenzen.
+   ============================================================ */
+:root{
+  --paper:  #F7F8F6;
+  --card:   #FFFFFF;
+  --steel:  #D8DEE0;
+  --steel-2:#C3CCCF;
+  --ink:    #1B2A33;
+  --ink-2:  #51636E;
+  --duct:   #2E6E8E;
+  --duct-bg:#E8F0F4;
+  --seal:   #C75B12;
+  --ok:     #3F7D54;
+  --warn-bg:#FBF1E7;
+  --code-bg:#122430;
+  --code-ink:#D4E2EC;
+  --c-key:#7FC0E0; --c-str:#E5B567; --c-com:#7A93A3; --c-num:#F0A054;
+  --fd:'Barlow Semi Condensed',Arial,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',Consolas,monospace;
+  --maxw:880px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{font-family:var(--fb);font-size:16px;line-height:1.62;color:var(--ink);background:var(--paper)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+p{margin:0 0 .95rem}
+ul,ol{margin:0 0 .95rem;padding-left:1.3rem}
+li{margin:.22rem 0}
+a{color:var(--duct)}
+code,kbd{font-family:var(--fm)}
+p code,li code,td code{font-size:.84em;background:var(--duct-bg);border:1px solid var(--steel);
+  padding:.05em .34em;border-radius:3px;color:var(--duct);white-space:nowrap}
+h1,h2,h3{font-family:var(--fd);line-height:1.12;color:var(--ink)}
+h1{font-size:2rem;font-weight:800;letter-spacing:.01em}
+h3{font-size:1.06rem;font-weight:700;margin:1.6rem 0 .55rem;text-transform:uppercase;letter-spacing:.04em;color:var(--duct)}
+
+/* titelblok = typeplaatje */
+.plate{background:var(--card);border:1.5px solid var(--steel-2);border-radius:6px;margin:34px auto 26px;
+  max-width:var(--maxw);padding:26px 30px;position:relative}
+.plate::before{content:"";position:absolute;inset:7px;border:1px solid var(--steel);border-radius:3px;pointer-events:none}
+.plate .tag{font-family:var(--fm);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);font-weight:500}
+.plate h1{margin:.3rem 0 .45rem}
+.plate .sub{color:var(--ink-2);max-width:60ch}
+.plate .specs{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:14px;font-family:var(--fm);font-size:12px;color:var(--ink-2)}
+.plate .specs b{color:var(--ink);font-weight:500}
+
+/* hoofdstukkop = kanaalsegment met flenzen */
+.duct{display:flex;align-items:center;margin:2.6rem 0 1.1rem;break-inside:avoid}
+.duct .flens{width:9px;align-self:stretch;border-left:2.5px solid var(--duct);border-right:2.5px solid var(--duct);flex-shrink:0}
+.duct .buis{flex:1;background:var(--duct);color:#fff;padding:.5rem 1rem;display:flex;align-items:baseline;gap:.85rem}
+.duct .nr{font-family:var(--fm);font-size:.85rem;opacity:.85}
+.duct h2{font-size:1.28rem;font-weight:800;color:#fff;letter-spacing:.02em}
+
+figure.code{background:var(--code-bg);border-radius:6px;margin:0 0 1.05rem;overflow:hidden;break-inside:avoid}
+figure.code figcaption{font-family:var(--fm);font-size:11.5px;color:#9FB6C4;padding:.5rem .95rem;
+  border-bottom:1px solid rgba(255,255,255,.09);display:flex;justify-content:space-between}
+figure.code pre{padding:.85rem .95rem;overflow-x:auto}
+figure.code code{font-size:13px;line-height:1.58;color:var(--code-ink);display:block;white-space:pre}
+.tk-k{color:var(--c-key)}.tk-s{color:var(--c-str)}.tk-c{color:var(--c-com);font-style:italic}.tk-n{color:var(--c-num)}
+
+.tree{background:var(--card);border:1px solid var(--steel);border-left:4px solid var(--duct);border-radius:4px;
+  font-family:var(--fm);font-size:13px;line-height:1.7;padding:.9rem 1.1rem;margin:0 0 1.05rem;overflow-x:auto;white-space:pre;break-inside:avoid}
+.tree b{color:var(--duct);font-weight:600}
+.tree i{color:var(--ink-2);font-style:normal}
+
+.kader{border:1px solid var(--steel);border-left-width:4px;border-radius:4px;background:var(--card);
+  padding:.8rem 1rem .55rem;margin:0 0 1.05rem;break-inside:avoid}
+.kader .lb{font-family:var(--fm);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.k-tip{border-left-color:var(--duct)}.k-tip .lb{color:var(--duct)}
+.k-let{border-left-color:var(--seal);background:var(--warn-bg)}.k-let .lb{color:var(--seal)}
+.k-ok{border-left-color:var(--ok)}.k-ok .lb{color:var(--ok)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 1.05rem;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--card)}
+th,td{border:1px solid var(--steel);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{font-family:var(--fd);font-weight:700;background:var(--duct-bg);letter-spacing:.02em}
+
+.oefening{border:1.5px solid var(--duct);border-radius:6px;margin:0 0 1.05rem;background:var(--card);break-inside:avoid}
+.oefening .kop{font-family:var(--fd);font-weight:700;background:var(--duct-bg);color:var(--duct);
+  padding:.5rem 1rem;border-bottom:1px solid var(--steel);letter-spacing:.02em}
+.oefening .body{padding:.85rem 1rem .05rem}
+
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding-left:1.5rem;position:relative}
+.checklist li::before{content:"✓";position:absolute;left:.15rem;color:var(--ok);font-weight:700}
+
+footer{margin:3rem 0 2.2rem;border-top:1.5px solid var(--steel-2);padding-top:1rem;
+  font-family:var(--fm);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media print{
+  :root{font-size:15px}
+  body{background:#fff}
+  .plate{margin-top:0;border-color:#999}
+  .duct{break-after:avoid;page-break-after:avoid}
+  section.hfd{break-before:page;page-break-before:always}
+  section.hfd:first-of-type{break-before:auto;page-break-before:auto}
+  figure.code{border:1px solid #ccc}
+  a{color:var(--ink);text-decoration:none}
+  @page{size:A4;margin:16mm 15mm}
+}
+</style>
+</head>
+<body>
+
+<div class="plate">
+  <span class="tag">IDG Toolbar · interne documentatie</span>
+  <h1>iExport — overdracht &amp; vervolgplan</h1>
+  <p class="sub">De afgelegde route van idee tot afgeronde Fase 1, de staat van het project op dit moment, en het concrete plan voor de fasen die volgen — tot en met de C#-port.</p>
+  <div class="specs">
+    <span>Document <b>IDG-HO-IEXP</b></span>
+    <span>Versie <b>1.0</b></span>
+    <span>App-versie <b>0.3.2 (Fase 1 afgerond)</b></span>
+    <span>Getest op <b>Revit 2024</b></span>
+    <span>Auteur <b>Bram de Jong</b></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ==================== 1 ==================== -->
+<section class="hfd" id="h1">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">01</span><h2>Doel en gebruik van dit document</h2></div><span class="flens"></span></div>
+
+<p>Dit is het overdrachtsdocument van het iExport-project. Het legt drie dingen vast: <b>wat er is gebeurd</b> (de route van idee tot afgeronde Fase 1, stap voor stap), <b>waar het project nu staat</b> (versies, teststatus, pakketinhoud) en <b>wat er gaat gebeuren</b> (Fase 2 tot en met 5, inclusief de C#-port). Het is geschreven om een vervolgsessie — of een collega — zonder voorkennis koud te kunnen laten starten; de technische diepgang staat in de twee zusterdocumenten <code>docs/PLAN.md</code> (bouwplan en beslissingen) en <code>IDG-UITL-IEXP</code> (volledige uitleg van de app).</p>
+
+<div class="kader k-tip"><span class="lb">Koude start van de vervolgsessie</span>
+<p>Start een <b>nieuw gesprek</b>, upload de finale Fase-1-zip (<code>iexport-fase1.zip</code> — bevat code, PLAN en beide documenten) en open met onderstaand bericht. Alles wat nodig is zit in het pakket; dit gesprek hoeft niet mee.</p>
+</div>
+
+<figure class="code"><figcaption>openingsbericht voor de vervolgsessie<span>tekst</span></figcaption>
+<pre><code>Dit is iExport na afronding van Fase 1 (app v0.3.2) — zie docs/PLAN.md
+en docs/IDG-HO-IEXP.html in de bijlage. Start Fase 2 en begin met blok A:
+de naamregels-API (SetNamingRule) als snel exportpad, met de smoketest-
+meting van ±20 s per A0 als nulpunt en het CSV-rapport als meetlat.</code></pre></figure>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section class="hfd" id="h2">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">02</span><h2>Momentopname: waar het project staat</h2></div><span class="flens"></span></div>
+
+<p>Fase 1 is op 24 augustus 2026 formeel afgerond met een volledige live-smoketest op Revit 2024. De eindstand per onderdeel:</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:22%">Onderdeel</th><th style="width:14%">Status</th><th>Toelichting</th></tr>
+<tr><td>PDF</td><td>✓ Bewezen</td><td>Los én gecombineerd; sjabloonnamen; raster/vector; vast papierformaat met zoom en plaatsing; gemengde formaten in één run</td></tr>
+<tr><td>DWG</td><td>✓ Bewezen</td><td>Exportsetups uit het model; xrefs-optie in Revit-bewoording</td></tr>
+<tr><td>IFC</td><td>✓ Bewezen</td><td>3D-export geopend en gecontroleerd in Solibri</td></tr>
+<tr><td>DWF</td><td>✓ Bewezen</td><td>Werkend na transactiefix (API eist een bewerkbaar document)</td></tr>
+<tr><td>NWC</td><td>✓ Bewezen</td><td>Werkend met geïnstalleerde NWC Export Utility; nette overslag zonder</td></tr>
+<tr><td>IMG</td><td>✓ Bewezen</td><td>Bestandsnaam exact volgens sjabloon (hernoemstap actief)</td></tr>
+<tr><td>DGN</td><td>⏸ Geparkeerd</td><td>Beslissing D5: rode, niet-activeerbare tegel; code en detectie blijven aan boord</td></tr>
+<tr><td>Profielen</td><td>✓ Bewezen</td><td>Opslaan, heropenen, herladen inclusief alle Fase-1-velden</td></tr>
+<tr><td>Prestaties</td><td>✓ Bewezen</td><td>Opstart van ±2 minuten naar ±1 seconde; PDF-rendertijd ±20 s per A0 op 300 dpi (Revit-rendering, niet de tool)</td></tr>
+</table></div>
+
+<p>Het pakket <code>iexport-fase1.zip</code> bevat de motor (<code>lib/iexport</code>), de knop (<code>iExport.pushbutton</code>), het bouwplan (<code>docs/PLAN.md</code>) en beide huisstijl-documenten. Installatie: motor in de extensie-<code>lib</code>, knop in panel <code>08_iExport.panel</code>; details in de README. Omgeving: Revit 2022+ (getest op 2024), pyRevit met IronPython 2.7, onderdeel van de IDG Toolbar.</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section class="hfd" id="h3">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">03</span><h2>De afgelegde route, stap voor stap</h2></div><span class="flens"></span></div>
+
+<p>Het project liep in acht herkenbare stappen, van eerste idee tot afgehecht product — alles binnen vier dagen in augustus 2026.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:8%">Stap</th><th style="width:30%">Wat er gebeurde</th><th>Kerninzicht of -besluit</th></tr>
+<tr><td><b>1</b></td><td><b>Idee &amp; analyse.</b> Functionaliteit van de referentietool (ProSheets) geïnventariseerd op basis van schermafbeeldingen; feature-matrix opgesteld.</td><td>Clean-room bouwen op de native Revit 2022+-exportroute; de referentie draait nog op een printerdriver — dat verschil bepaalt het hele ontwerp.</td></tr>
+<tr><td><b>2</b></td><td><b>Plan &amp; architectuur.</b> PLAN.md met fasering, risico's en teststrategie; aannames A1–A5 vastgelegd.</td><td>Strikte scheiding motor (UI-vrij, <code>lib/iexport</code>) en schil (pushbutton) — de latere C#-port raakt daardoor alleen de schil.</td></tr>
+<tr><td><b>3</b></td><td><b>Fase 0 (v0.1).</b> Driestaps-wizard gebouwd met PDF, DWG en IFC werkend; profielen, CSV-rapport, voortgang; vier formaten als zichtbare plekken gereserveerd.</td><td>De per-blad-exporttruc (Combine=True + FileName) garandeert sjabloonnamen; niets wordt ooit stil overgeslagen.</td></tr>
+<tr><td><b>4</b></td><td><b>API-verificatie.</b> Extra schermafbeeldingen per formaat verwerkt; de complete PDF-optieset geverifieerd tegen de officiële API-documentatie.</td><td>C# voegt voor deze functionaliteit níets toe — beide talen zetten dezelfde API-properties. Besluit D1: eerst bewijzen in pyRevit, dan pas porten.</td></tr>
+<tr><td><b>5</b></td><td><b>Fase 1 (v0.2).</b> DWF, NWC, DGN en IMG als echte exporters; PDF-paneel verdiept (papierformaat, oriëntatie, plaatsing in mm, zoom, dpi); NL-tokenaliassen; beslissingen D2–D4 en guard G1.</td><td>Elke instelling loopt via drie kleine koppeltabellen — een nieuwe optie toevoegen is één regel per tabel.</td></tr>
+<tr><td><b>6</b></td><td><b>Installatie &amp; de reload-les.</b> Twee identieke Revit-crashes gediagnosticeerd via de journals: teardown-fase van pyRevit-Reload, onafhankelijk van iExport. Panel-zichtbaarheid opgelost (mapstructuur).</td><td>Vuistregel: nieuwe bundles of yaml-wijzigingen → koude start; alleen codewijzigingen → Reload volstaat.</td></tr>
+<tr><td><b>7</b></td><td><b>Smoketest &amp; verharding (v0.3–v0.3.2).</b> Opstart van 2 minuten naar 1 seconde (één titleblock-pass i.p.v. per-sheet collectors); DWF-transactiefix; DGN-diagnose en -parkering (D5); alle formaten live getest.</td><td>Elke van-geheugen-aanname droeg een expliciet verificatielabel; de smoketest heeft alle drie afgevoerd. Uitzonderingen testen (gemengde papierformaten, 50%-zoom) valideerde het ontwerp.</td></tr>
+<tr><td><b>8</b></td><td><b>Afronding.</b> Documentatie IDG-UITL-IEXP naar v1.1 met de volledige smoketest-eindstand; PLAN afgehecht; dit overdrachtsdocument.</td><td>Elke fase eindigt met een zip + bijgewerkt PLAN die samen als koude-start-overdracht werken.</td></tr>
+</table></div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section class="hfd" id="h4">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">04</span><h2>Lessen en vuistregels</h2></div><span class="flens"></span></div>
+
+<ul class="checklist">
+<li><b>Koude start bij structuurwijzigingen.</b> Nieuwe bundles, panelen of yaml-aanpassingen: Revit volledig herstarten. pyRevit-Reload is precies dán het fragielst en crashte in deze omgeving reproduceerbaar tijdens de afbraakfase.</li>
+<li><b>Label wat uit geheugen komt.</b> API-aannames die niet tegen documentatie geverifieerd zijn, krijgen een expliciet verificatielabel in de docstring plus een <code>hasattr</code>/<code>try</code>-vangnet — en de smoketest voert ze af of corrigeert ze.</li>
+<li><b>Test de uitzonderingen.</b> Gemengde papierformaten in één run en een bewust niet-passende zoomfactor hebben meer ontwerpkeuzes gevalideerd dan tien standaardruns.</li>
+<li><b>Nooit stil falen.</b> Elke taak eindigt zichtbaar op Gereed, Fout-met-reden of Overgeslagen-met-reden; foutmeldingen bevatten waar mogelijk de oplossing (zie DGN).</li>
+<li><b>Eén export-aanroep per blad = naamgarantie.</b> Dat is een bewuste ruil tegen snelheid; het snelle pad (naamregels-API) is het eerste blok van Fase 2.</li>
+<li><b>Versie bij elke wijziging.</b> Changelog in de scriptheader, versienummer in venster en README — de smoketest bewees hoe waardevol dat is bij het herleiden van gedrag.</li>
+</ul>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section class="hfd" id="h5">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">05</span><h2>Fase 2 — verdieping en snelheid</h2></div><span class="flens"></span></div>
+
+<p>Fase 2 verdiept wat er staat, met snelheid als hoofdthema. Drie blokken, in volgorde van waarde:</p>
+
+<p><b>Blok A — het snelle exportpad (naamregels-API).</b> Revit kan sinds de native PDF-export bestandsnamen zelf opbouwen uit parameters via <code>SetNamingRule</code> en <code>TableCellCombinedParameterData</code>. Daarmee kan één enkele export-aanroep de hele set verwerken, waar nu elk blad zijn eigen aanroep (en dus zijn eigen bladregeneratie) krijgt. De smoketest-meting van ±20 seconden per A0 is het nulpunt; het CSV-rapport logt de duur per taak, dus de winst is direct meetbaar op een echte weekset. De per-blad-truc blijft bestaan als terugvalpad voor sjablonen die de naamregels niet aankunnen (zoals vrije <code>{p:}</code>-combinaties met bewerkte teksten) — de tool kiest zelf het snelste pad dat de gevraagde naam exact kan leveren.</p>
+
+<p><b>Blok B — paginavolgorde voor de gecombineerde PDF.</b> Een sleepbare volgorde in de jobtabel (het "Order sheets and views"-equivalent), zodat de combi-PDF de gewenste bladvolgorde krijgt in plaats van de selectievolgorde.</p>
+
+<p><b>Blok C — DWG-verdieping (op vraag).</b> Een eigen paneel voor de losse DWG-opties (solids/ACIS, lijnschaal, lagenmapping-overrides) voor situaties zonder passende exportsetup in het model. Alleen bouwen als de tekenkamer erom vraagt; de setup-route dekt de praktijk nu al.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:34%">Beslispunt bij de start van Fase 2</th><th>Opties</th></tr>
+<tr><td>Naamregels-pad standaard of opt-in?</td><td>Standaard-met-terugval (advies) · alleen via vinkje "snelle export"</td></tr>
+<tr><td>Volgorde-UI</td><td>Alleen voor de combi-PDF (advies) · voor de hele joblijst</td></tr>
+<tr><td>Blok C nu meenemen?</td><td>Op vraag (advies) · direct meebouwen</td></tr>
+</table></div>
+
+<p><b>Klaar wanneer:</b> een echte weekset aantoonbaar sneller exporteert (CSV vóór/na op dezelfde selectie), de combi-PDF een gekozen volgorde volgt, en de bestandsnamen in beide paden identiek zijn aan het sjabloon.</p>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section class="hfd" id="h6">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">06</span><h2>Fase 3 en 4 — werkcomfort en interne uitrol</h2></div><span class="flens"></span></div>
+
+<p><b>Fase 3 — werkcomfort.</b> De tool onthoudt per model of project de laatste instellingen (doelmap, formaten, sjabloon), zodat de vrijdagronde begint waar hij vorige week eindigde; een standaardprofiel per project; kleine verbeteringen die uit dagelijks gebruik komen — denk aan een annuleerknop tijdens de run en dpi-presets "concept" en "definitief". Deze fase wordt bewust gevoed door gebruikservaring van de tekenkamer, niet door een vooraf dichtgetimmerde lijst.</p>
+
+<p><b>Fase 4 — interne uitrol en beheer.</b> Uitrol naar de andere werkplekken via de bestaande toolbar-verspreiding, met een vast update-ritme en het changelog-discipline uit de scriptheader; afspraken over wie profielen beheert (persoonlijk in <code>%APPDATA%</code>, eventueel aangevuld met een gedeelde profielenmap voor huisrecepten); en een compacte gebruikershandleiding van één A4 voor collega's — de diepgaande uitleg bestaat al (IDG-UITL-IEXP), dit is de snelstartkaart ernaast.</p>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section class="hfd" id="h7">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">07</span><h2>Fase 5 — de C#-port (spoor Stroomlijn)</h2></div><span class="flens"></span></div>
+
+<p>De C#-port is vanaf dag één voorbereid maar bewust uitgesteld (besluit D1): je port geen experiment, je port een bewezen product — en dat is het nu. De motor is UI-vrij, de smoketest is het gedragscontract, en de Python-versie blijft tijdens de port dienen als referentie-implementatie én testorakel.</p>
+
+<h3>7.1 Wat de port oplevert</h3>
+<ul class="checklist">
+<li><b>Installatie zonder pyRevit</b>: een reguliere Revit-add-in (.addin + dll), inzetbaar op elke werkplek ongeacht de pyRevit-situatie.</li>
+<li><b>Multi-target</b>: één codebase gebouwd voor Revit 2023 t/m 2026 (het bestaande Stroomlijn-skelet uit de eerdere verkenning is hiervoor het startpunt).</li>
+<li><b>Modeless venster</b> via <code>ExternalEvent</code>: Revit blijft bedienbaar terwijl iExport openstaat — een merkbare UX-sprong die in pyRevit lastiger schoon te bouwen is.</li>
+<li><b>Debugbaarheid en typechecks</b>: breakpoints, compile-time controle, nettere foutrapportage.</li>
+<li><b>Eén exportkern, twee gezichten</b>: dezelfde motor voedt straks ook de headless batch-verwerking (het bestaande batch-exportspoor), zodat wizard en achtergrondverwerking nooit meer uiteen kunnen lopen.</li>
+</ul>
+
+<h3>7.2 De vertaaltabel</h3>
+<p>De port is een één-op-één-vertaling per module; het gedrag is al vastgelegd door de smoketest. Eén detail met directe waarde: het profielformaat (JSON, zelfde schema) blijft identiek — <b>bestaande profielen werken ongewijzigd in de C#-versie</b>.</p>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:30%">Python (nu)</th><th style="width:34%">C# (straks)</th><th>Opmerking</th></tr>
+<tr><td><code>const.py</code></td><td><code>Constants.cs</code> + enums</td><td>Combolijsten worden echte enums met NL-labels als resources</td></tr>
+<tr><td><code>models.py</code></td><td><code>ItemRow.cs</code> / <code>JobRow.cs</code></td><td>Zelfde <code>INotifyPropertyChanged</code>-patroon, identiek bindingsgedrag</td></tr>
+<tr><td><code>collect.py</code></td><td><code>CollectService.cs</code></td><td>Inclusief de éne titleblock-pass (de 2-minuten-naar-1-seconde-les)</td></tr>
+<tr><td><code>naming.py</code></td><td><code>NamingService.cs</code></td><td>Tokenparser incl. NL-aliassen en dedup</td></tr>
+<tr><td><code>profiles.py</code></td><td><code>ProfileStore.cs</code></td><td><b>Zelfde JSON-schema</b>: profielen blijven uitwisselbaar</td></tr>
+<tr><td><code>papersize.py</code> / <code>report.py</code></td><td><code>PaperSize.cs</code> / <code>ReportWriter.cs</code></td><td>Rechttoe-rechtaan vertalingen</td></tr>
+<tr><td><code>exporters/*</code></td><td><code>IExporter</code> + klasse per formaat</td><td>Zelfde registry-patroon; transactie-eis DWF en detecties gaan mee</td></tr>
+<tr><td><code>ui.xaml</code></td><td>vrijwel ongewijzigd</td><td>WPF is WPF — alleen de event-koppeling verhuist naar C#</td></tr>
+<tr><td><code>script.py</code></td><td><code>MainWindow.xaml.cs</code> + ExternalEvent-laag</td><td>De koppeltabellen (bool/combo/tekst) keren als dictionaries terug</td></tr>
+</table></div>
+
+<h3>7.3 Teststrategie en volgorde</h3>
+<p>Het acceptatiecriterium is een <b>parallelrun</b>: dezelfde selectie met hetzelfde profiel door beide versies, en de twee CSV-rapporten naast elkaar — gelijke bestandsnamen, gelijke statussen, vergelijkbare of betere tijden. Pas daarna schakelt de tekenkamer om; de pyRevit-versie blijft nog één release als vangnet staan. Qua volgorde is Fase 5 niet aan Fase 3 en 4 gebonden: wordt installatie-zonder-pyRevit of het modeless venster eerder urgent, dan kan de port direct na Fase 2 starten en landen de comfort- en uitrolfasen in de C#-versie.</p>
+
+<div class="kader k-tip"><span class="lb">Goed om te weten</span>
+<p>De port herschrijft niets aan het productontwerp: schermen, teksten, profielen, rapporten en gedrag zijn al af en getest. Het is een taalwissel van een bewezen machine — precies waarom hij aan het eind staat en niet aan het begin.</p>
+</div>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section class="hfd" id="h8">
+<div class="duct"><span class="flens"></span><div class="buis"><span class="nr">08</span><h2>Documenthistorie</h2></div><span class="flens"></span></div>
+
+<div class="tbl-wrap"><table>
+<tr><th style="width:14%">Versie</th><th style="width:20%">Datum</th><th>Wijziging</th></tr>
+<tr><td>1.0</td><td>24-08-2026</td><td>Eerste uitgave: route t/m afronding Fase 1 (app v0.3.2) en vervolgplan Fase 2–5.</td></tr>
+</table></div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>IDG Toolbar · iExport — overdracht &amp; vervolgplan · IDG-HO-IEXP v1.0</span>
+  <span>&copy; 2026 Bram de Jong — priv&eacute; ontwikkeld, ter beschikking gesteld aan Interduct</span>
+</footer>
+
+<script>
+(function(){
+  document.querySelectorAll('figure.code code').forEach(function(el){
+    var s = el.innerHTML;
+    var store=[];
+    // placeholder = 1 teken uit de private use area -> bevat nooit cijfers,
+    // dus de getal-regex kan de placeholders niet meer kapotmaken
+    function put(cls,txt){store.push('<span class="'+cls+'">'+txt+'</span>');return String.fromCharCode(0xE000+store.length-1);}
+    // strings en comments in EEN alternatie: wat het eerst begint, wint
+    // (een # binnen een string wordt zo nooit als comment gezien)
+    s = s.replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')|(#.*$)/gm, function(m,str,com){return put(str?'tk-s':'tk-c',m);});
+    s = s.replace(/\b(def|class|if|else|elif|for|while|return|import|from|with|as|in|not|and|or|None|True|False|try|except|pass)\b/g,'<span class="tk-k">$1</span>');
+    s = s.replace(/\b(\d+(\.\d+)?)\b/g,'<span class="tk-n">$1</span>');
+    s = s.replace(/[\uE000-\uF8FF]/g,function(m){return store[m.charCodeAt(0)-0xE000];});
+    el.innerHTML = s;
+  });
+})();
+</script>
+</body>
+</html>
